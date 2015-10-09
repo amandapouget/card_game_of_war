@@ -1,7 +1,7 @@
 class Deck
   attr_reader :cards
 
-  def initialize
+  def initialize # this filling with standard deck makes your deck too specific, unusable for other games... suggest having this type passed a parameter or making a deck subtype
     @cards = []
     ranks = ["two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "jack", "queen", "king", "ace"]
     suits = ["clubs", "diamonds", "hearts", "spades"]
@@ -13,7 +13,6 @@ class Deck
   end
 
   def shuffle
-    @cards.shuffle!
     @cards.shuffle!
   end
 

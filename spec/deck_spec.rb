@@ -40,11 +40,11 @@ describe(Deck) do
       my_unshuffled_deck = Deck.new
       my_deck.cards.each { |card| card.turn_over }
       my_unshuffled_deck.cards.each { |card| card.turn_over }
-      expect(my_deck.cards==my_unshuffled_deck.cards).to be true # In this line, I'm testing if I've turned over the cards... ? Else get a test that always passes!
+      expect(my_deck.cards == my_unshuffled_deck.cards).to be true # In this line, I'm testing if I've turned over the cards... ? Else get a test that always passes!
       my_deck.shuffle
-      expect(my_deck.cards==my_unshuffled_deck.cards).to be false
+      expect(my_deck.cards == my_unshuffled_deck.cards).to be false
       my_unshuffled_deck.shuffle
-      expect(my_deck.cards==my_unshuffled_deck.cards).to be false
+      expect(my_deck.cards == my_unshuffled_deck.cards).to be false
     end
   end
 

@@ -11,7 +11,6 @@ If the cards are the same rank, it is War. Each player turns up one card face do
 HOW TO KEEP SCORE
 The game ends when one player has won all the cards.
 
-
 Objects: Responsibilities, Questions, Commands, Information
 card
   R: displaying rank & suit, hiding rank & suit (face up, face down)
