@@ -27,7 +27,7 @@ player
   R: manages a collection of cards it owns
   Q: what cards do you have? what is the top card? are you out of cards?
   C: play round, play war round, add_winnings
-  I: cards it has, the order of the cards, top card, if empty
+  I: cards it has, the order of the cards--no wait, a player doesn't know that in a real game!--, top card, if empty
 game
   R: manages the movement between two players
   Q: who won the round? who won the game?
