@@ -45,7 +45,11 @@ describe Player do
       player.play_next_card
       expect(player.count_cards).to eq count - 1
     end
-
+    it 'does nothing if the player is out of cards' do
+      my_player = Player.new(name: "Smith")
+      my_player.play_next_card
+      expect(my_player.out_of_cards?).to be true
+    end
   end
 
   describe '#play_war_cards' do

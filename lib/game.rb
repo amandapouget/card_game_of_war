@@ -11,19 +11,16 @@ class Game
 
   def deal
     deck.shuffle
-    loop do
-      player1.add_card(deck.deal_next_card) unless deck.empty?
+    while !deck.empty?
+      player1.add_card(deck.deal_next_card)
       player2.add_card(deck.deal_next_card) unless deck.empty?
-      break if deck.empty?
     end
   end
 
   def play
-    loop do
+    while !game_over?
       play_round
-      break if game_over?
     end
-    declare_game_winner
   end
 
   def play_round(cards_bet = [])
@@ -39,14 +36,16 @@ class Game
     elsif player2_card.rank_numeric_value > player1_card.rank_numeric_value
       winner = player2
       winner.collect_winnings(cards_on_table)
+    elsif game_over?
+      return
     else
-      hidden_card1 = player1.play_next_card
-      hidden_card2 = player2.play_next_card
-      hidden_card1.turn_over
-      hidden_card2.turn_over
-      cards_on_table << hidden_card1
-      cards_on_table << hidden_card2
-      winner = play_round(cards_on_table)
+        hidden_card1 = player1.play_next_card
+        hidden_card2 = player2.play_next_card
+        hidden_card1.turn_over
+        hidden_card2.turn_over
+        cards_on_table << hidden_card1
+        cards_on_table << hidden_card2
+        winner = play_round(cards_on_table) unless game_over?
     end
     return winner
   end

@@ -14,6 +14,7 @@ class Deck
 
   def shuffle
     @cards.shuffle!
+    @cards.shuffle!
   end
 
   def count_cards

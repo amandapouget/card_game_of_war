@@ -8,6 +8,7 @@ class Player
   end
 
   def play_next_card
+    return if out_of_cards?
     @cards[0].turn_over
     @cards.shift
   end
