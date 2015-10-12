@@ -30,7 +30,7 @@ describe Game do
   context 'game started and deck is freshly dealt' do
     let(:player1) { Player.new(name: "Amanda") }
     let(:player2) { Player.new(name: "Vianney") }
-    let(:game) { Game.new(player1: player1, player2: player2) } #can't get it to deal since it won't call deal when the player is called....
+    let(:game) { Game.new(player1: player1, player2: player2) }
 
     before(:each) do
       game.deal
@@ -63,68 +63,76 @@ describe Game do
       end
     end
   end
-end
-=begin
-      context 'war' do
-        let(:player1) {
-          player1 = Player.new(name: "Amanda")
-          player1.play_next_card until player1.out_of_cards?
-          player1.add_card(card_ks)
-          player1
-        }
-        let(:player2) {
-          player2 = Player.new(name: "Vianney")
-          player2.play_next_card until player2.out_of_cards?
-          player2.add_card(card_kh)
-          player2
-        }
-        let(:card_ks) { Card.new(rank:"king", suit: "spades") }
-        let(:card_kh) { Card.new(rank:"king", suit: "hearts") }
-        let(:card_js) { Card.new(rank: "jack", suit: "spades") }
-        let(:card_ad) { Card.new(rank: "ace", suit: "diamonds") }
-        let(:card_9d) { Card.new(rank: "nine", suit: "diamonds") }
-        let(:card_4c) { Card.new(rank: "four", suit: "clubs") }
 
-        it 'in the case of no winner, plays war and successfully finishes the round' do
-          player1.add_card(card_js)
-          player2.add_card(card_ad)
-          player1.add_card(card_9d)
-          player2.add_card(card_4c)
-          expect(game.play_round).to eq player1
-          expect(player2.count_cards).to be 0
-          expect(player1.cards).to match_array [card_ks, card_kh, card_js, card_ad, card_9d, card_4c]
-        end
+  context 'war' do
+    let(:player1) { player1 = Player.new(name: "Amanda") }
+    let(:player2) { Player.new(name: "Vianney") }
+    let(:game) { Game.new(player1: player1, player2: player2)}
+    let(:card_ks) { Card.new(rank:"king", suit: "spades") }
+    let(:card_kh) { Card.new(rank:"king", suit: "hearts") }
+    let(:card_js) { Card.new(rank: "jack", suit: "spades") }
+    let(:card_ad) { Card.new(rank: "ace", suit: "diamonds") }
+    let(:card_9d) { Card.new(rank: "nine", suit: "diamonds") }
+    let(:card_4c) { Card.new(rank: "four", suit: "clubs") }
 
-        it 'in case of one player having no cards to play war, successfully ends the game' do
-          player2.add_card(card_ad)
-          player2.add_card(card_4c)
-          expect(game.play_round).to eq player2
-          expect(player1.count_cards).to eq 0
-          expect(game_over?).to be true
-          expect(game.winner).to eq player2
-        end
+    before do
+      player1.add_card(card_ks)
+      player2.add_card(card_kh)
+    end
 
-        it 'in case of one player having only one card to play war, successfully ends the game' do
-          player1.add_card(card_js)
-          player2.add_card(card_ad)
-          player1.add_card(card_9d)
-          expect(game.play_round).to eq player1
-          expect(player2.count_cards).to eq 0
-          expect(game_over?).to be true
-          expect(game.winner).to eq player1
-        end
+    describe '#play_round' do
+      it 'in the case of no winner, plays war and successfully finishes the round' do
+        player1.add_card(card_js)
+        player2.add_card(card_ad)
+        player1.add_card(card_9d)
+        player2.add_card(card_4c)
+        expect(game.play_round).to eq player1
+        expect(player2.count_cards).to be 0
+        expect(player1.cards).to match_array [card_ks, card_kh, card_js, card_ad, card_9d, card_4c]
       end
+
+      it 'in case of one player having no cards to play war, successfully ends the game' do
+        player2.add_card(card_ad)
+        player2.add_card(card_4c)
+        expect(game.play_round).to eq player2
+        expect(player1.count_cards).to eq 0
+        expect(game.game_over?).to be true
+        expect(game.winner).to eq player2
+      end
+
+      it 'in case of one player having only one card to play war, successfully ends the game' do
+        player1.add_card(card_js)
+        player2.add_card(card_ad)
+        player1.add_card(card_9d)
+        expect(game.play_round).to eq player1
+        expect(player2.count_cards).to eq 0
+        expect(game.game_over?).to be true
+        expect(game.winner).to eq player1
+      end
+    end
+  end
+
+  context 'end-game' do
+    let(:player1) { Player.new(name: "Amanda") }
+    let(:player2) { Player.new(name: "Vianney") }
+    let(:game) { Game.new(player1: player1, player2: player2) }
+    def empty(player)
+      player.play_next_card until player.out_of_cards?
+    end
+
+    before(:each) do
+      game.deal
     end
 
     describe '#declare_game_winner' do
       it 'returns player1 if player2 is out of cards' do
-        player2.play_next_card until player2.out_of_cards?
+        empty(player2)
         game.declare_game_winner
         expect(game.winner).to eq player1
       end
 
       it 'returns player2 if player1 is out of cards' do
-        player1.play_next_card until player1.out_of_cards?
+        empty(player1)
         game.declare_game_winner
         expect(game.winner).to eq player2
       end
@@ -141,10 +149,9 @@ end
       end
 
       it 'returns true when one player is out of cards' do
-        player1.play_next_card until player1.out_of_cards?
+        empty(player1)
         expect(game.game_over?).to be true
       end
     end
   end
 end
-=end
