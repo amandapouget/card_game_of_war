@@ -15,7 +15,7 @@ describe Player do
     end
   end
 
-  context 'Player with a full deck' do
+  context 'player with a full deck' do
     let(:player) do
       deck = Deck.new(type: 'regular')
       deck.shuffle
