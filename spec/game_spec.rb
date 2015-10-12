@@ -117,24 +117,18 @@ describe Game do
   context 'end-game' do
     let(:player1) { Player.new(name: "Amanda") }
     let(:player2) { Player.new(name: "Vianney") }
+    let(:card) { Card.new(rank: 'ace', suit: 'spades') }
     let(:game) { Game.new(player1: player1, player2: player2) }
-    def empty(player)
-      player.play_next_card until player.out_of_cards?
-    end
-
-    before(:each) do
-      game.deal
-    end
 
     describe '#declare_game_winner' do
       it 'returns player1 if player2 is out of cards' do
-        empty(player2)
+        player1.add_card(card)
         game.declare_game_winner
         expect(game.winner).to eq player1
       end
 
       it 'returns player2 if player1 is out of cards' do
-        empty(player1)
+        player2.add_card(card)
         game.declare_game_winner
         expect(game.winner).to eq player2
       end
@@ -150,8 +144,7 @@ describe Game do
         expect(game.game_over?).to be false
       end
 
-      it 'returns true when one player is out of cards' do
-        empty(player1)
+      it 'returns true when one or more players are out of cards' do
         expect(game.game_over?).to be true
       end
     end
