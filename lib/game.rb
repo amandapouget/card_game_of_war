@@ -1,6 +1,6 @@
 class Game
 
-  attr_reader :player1, :player2, :deck, :winner
+  attr_reader :player1, :player2, :deck, :winner, :rounds_played
 
   def initialize(players)
     @player1 = players[:player1]
@@ -26,6 +26,7 @@ class Game
   end
 
   def play_round(cards_bet = [])
+    return declare_game_winner if game_over?
     cards_on_table = cards_bet
     player1_card = player1.play_next_card
     player2_card = player2.play_next_card
@@ -33,24 +34,25 @@ class Game
     cards_on_table << player2_card
 
     if player1_card.rank_value > player2_card.rank_value
+      cards_on_table.shuffle!
       winner = player1
-      cards_on_table.shuffle!
       winner.collect_winnings(cards_on_table)
+      @rounds_played += 1
+      return winner
     elsif player2_card.rank_value > player1_card.rank_value
-      winner = player2
       cards_on_table.shuffle!
+      winner = player2
       winner.collect_winnings(cards_on_table)
+      @rounds_played += 1
+      return winner
     elsif game_over?
-      return
+      @rounds_played += 1
+      return declare_game_winner
     else
-      hidden_card1 = player1.play_next_card
-      hidden_card2 = player2.play_next_card
-      cards_on_table << hidden_card1
-      cards_on_table << hidden_card2
-      winner = play_round(cards_on_table) unless game_over?
+      cards_on_table << player1.play_next_card
+      cards_on_table << player2.play_next_card
+      winner = play_round(cards_on_table)
     end
-    @rounds_played += 1
-    return winner
   end
 
   def declare_game_winner

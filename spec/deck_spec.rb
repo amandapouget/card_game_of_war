@@ -8,7 +8,7 @@ describe Deck do
       expect(my_deck.cards).to eq []
     end
 
-    it "when passed the type 'regular', has four cards of every rank, thirteen cards of every suit, and no two equal cards" do # I like this test because visually, it's exactly how you'd test this with a real deck
+    it "when passed the type 'regular', has four cards of every rank, thirteen cards of every suit, and no two equal cards" do
       my_deck = Deck.new(type: 'regular')
       rank_totals = Hash.new(0)
       suit_totals = Hash.new(0)
