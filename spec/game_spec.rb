@@ -36,6 +36,7 @@ describe Game do
       game.deal
     end
 
+=begin
     describe '#play' do
       it 'plays the game until the game is over' do
         expect(game.game_over?).to be false
@@ -48,6 +49,7 @@ describe Game do
         expect(game.winner).to_not eq nil
       end
     end
+=end
 
     describe '#play_round' do
       it 'gets a card from each player, compares who won, sends the player his winnings, increments rounds_played and returns round winner' do
