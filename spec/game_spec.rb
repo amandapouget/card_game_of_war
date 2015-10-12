@@ -36,21 +36,6 @@ describe Game do
       game.deal
     end
 
-=begin
-    describe '#play' do
-      it 'plays the game until the game is over' do
-        expect(game.game_over?).to be false
-        game.play
-        expect(game.game_over?).to be true
-      end
-
-      it 'makes sure there is a winner declared when play is over' do
-        game.play
-        expect(game.winner).to_not eq nil
-      end
-    end
-=end
-
     describe '#play_round' do
       it 'gets a card from each player, compares who won, sends the player his winnings, increments rounds_played and returns round winner' do
         player1.play_next_card until player1.cards[0].rank_value < player2.cards[0].rank_value

@@ -20,15 +20,6 @@ class Game
     end
   end
 
-=begin
-  def play
-    while !game_over?
-      play_round
-    end
-    declare_game_winner
-  end
-=end
-
   def play_round(cards_bet = [])
     return declare_game_winner if game_over?
     cards_on_table = cards_bet
