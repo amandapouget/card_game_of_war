@@ -1,13 +1,15 @@
 class Deck
   attr_reader :cards
 
-  def initialize # this filling with standard deck makes your deck too specific, unusable for other games... suggest having this type passed a parameter or making a deck subtype
+  def initialize(type: 'none')
     @cards = []
-    ranks = ["two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "jack", "queen", "king", "ace"]
-    suits = ["clubs", "diamonds", "hearts", "spades"]
-    ranks.each do |rank|
-      suits.each do |suit|
-        @cards << Card.new(rank: rank, suit: suit)
+    if type == 'regular'
+      ranks = ["two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "jack", "queen", "king", "ace"]
+      suits = ["clubs", "diamonds", "hearts", "spades"]
+      ranks.each do |rank|
+        suits.each do |suit|
+          @cards << Card.new(rank: rank, suit: suit)
+        end
       end
     end
   end
@@ -25,7 +27,7 @@ class Deck
   end
 
   def empty?
-    return count_cards==0
+    count_cards == 0
   end
 
   def add_card(card)
