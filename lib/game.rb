@@ -5,7 +5,7 @@ class Game
   def initialize(players)
     @player1 = players[:player1]
     @player2 = players[:player2]
-    @deck = Deck.new
+    @deck = Deck.new(type: 'regular')
     @winner = nil
     @rounds_played = 0
   end
@@ -32,11 +32,11 @@ class Game
     cards_on_table << player1_card
     cards_on_table << player2_card
 
-    if player1_card.rank_numeric_value > player2_card.rank_numeric_value
+    if player1_card.rank_value > player2_card.rank_value
       winner = player1
       cards_on_table.shuffle!
       winner.collect_winnings(cards_on_table)
-    elsif player2_card.rank_numeric_value > player1_card.rank_numeric_value
+    elsif player2_card.rank_value > player1_card.rank_value
       winner = player2
       cards_on_table.shuffle!
       winner.collect_winnings(cards_on_table)
@@ -56,7 +56,6 @@ class Game
   def declare_game_winner
     @winner = player1 if player2.out_of_cards?
     @winner = player2 if player1.out_of_cards?
-    puts @winner.name unless @winner == nil
     @winner
   end
 
