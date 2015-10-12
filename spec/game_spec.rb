@@ -5,6 +5,8 @@ describe Game do
     let(:player1) { Player.new(name: "Amanda") }
     let(:player2) { Player.new(name: "Vianney") }
     let(:game) { Game.new(player1: player1, player2: player2) }
+    let(:card_js) { Card.new(rank: "jack", suit: "spades") }
+    let(:card_ad) { Card.new(rank: "ace", suit: "diamonds") }
 
     describe '#initialize' do
       it 'creates a game with two players and a regular deck full of cards' do
@@ -25,20 +27,11 @@ describe Game do
         expect(game.deck.count_cards).to eq 0
       end
     end
-  end
-
-  context 'game started and deck is freshly dealt' do
-    let(:player1) { Player.new(name: "Amanda") }
-    let(:player2) { Player.new(name: "Vianney") }
-    let(:game) { Game.new(player1: player1, player2: player2) }
-
-
-    before(:each) do
-      game.deal
-    end
 
     describe '#play_round' do
       it 'gets a card from each player, compares who won, sends the player his winnings, increments rounds_played and returns round winner' do
+        player1.add_card(card_js)
+        player2.add_card(card_ad)
         player1.play_next_card until player1.cards[0].rank_value < player2.cards[0].rank_value
         player1_count = player1.count_cards
         player2_count = player2.count_cards
