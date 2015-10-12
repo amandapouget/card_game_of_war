@@ -1,7 +1,8 @@
 class Deck
-  attr_reader :cards
+  attr_reader :cards, :type
 
   def initialize(type: 'none')
+    @type = type
     @cards = []
     if type == 'regular'
       ranks = ["two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "jack", "queen", "king", "ace"]

@@ -2,8 +2,9 @@ require 'spec_helper'
 
 describe Deck do
   describe '#initialize' do
-    it "creates a deck with a card collection" do
+    it "creates a deck with a type and a card collection" do
       my_deck = Deck.new()
+      expect(my_deck.type).to eq 'none'
       expect(my_deck.cards).to eq []
     end
 

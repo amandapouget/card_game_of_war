@@ -12,6 +12,7 @@ describe Game do
     it 'creates a game with two players and a deck full of cards' do
       expect(@game.player1 ).to eq @player1
       expect(@game.player2).to eq @player2
+      expect(@game.deck.type).to eq 'regular'
     end
   end
 
