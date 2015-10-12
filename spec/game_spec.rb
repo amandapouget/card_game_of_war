@@ -69,7 +69,7 @@ describe Game do
   context 'war' do
     let(:player1) { player1 = Player.new(name: "Amanda") }
     let(:player2) { Player.new(name: "Vianney") }
-    let(:game) { Game.new(player1: player1, player2: player2)}
+    let(:game) { Game.new(player1: player1, player2: player2) }
     let(:card_ks) { Card.new(rank:"king", suit: "spades") }
     let(:card_kh) { Card.new(rank:"king", suit: "hearts") }
     let(:card_js) { Card.new(rank: "jack", suit: "spades") }
@@ -118,6 +118,7 @@ describe Game do
     let(:player1) { Player.new(name: "Amanda") }
     let(:player2) { Player.new(name: "Vianney") }
     let(:card) { Card.new(rank: 'ace', suit: 'spades') }
+    let(:card2) { Card.new(rank: 'ten', suit: 'spades') }
     let(:game) { Game.new(player1: player1, player2: player2) }
 
     describe '#declare_game_winner' do
@@ -134,6 +135,8 @@ describe Game do
       end
 
       it 'returns nil if neither player is out of cards' do
+        player1.add_card(card)
+        player2.add_card(card2)
         game.declare_game_winner
         expect(game.winner).to eq nil
       end
@@ -141,6 +144,8 @@ describe Game do
 
     describe '#game_over?' do
       it 'returns false if both players still have cards' do
+        player1.add_card(card)
+        player2.add_card(card2)
         expect(game.game_over?).to be false
       end
 
