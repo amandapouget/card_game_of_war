@@ -17,11 +17,11 @@ describe WarServer do
       client.capture_output
       expect(client.output).to eq "Welcome to war!\n"
       server_thread.terminate # have to do this before joining thread or get stuck in the loop
-      puts server_thread.alive?
+      #puts server_thread.alive?
       server_thread.join # have to join the thread in order to kill it
-      puts server_thread.alive?
+      #puts server_thread.alive?
       server_thread.kill
-      puts server_thread.alive? # thread is dead, yet, port still occupied so have to use port 2000 on other tests below. UPDATE: thread isn't dead, just can't tell it's alive because you've joined it
+      #puts server_thread.alive? # thread is dead, yet, port still occupied so have to use port 2000 on other tests below. UPDATE: thread isn't dead, just can't tell it's alive because you've joined it
     end
   end
 
