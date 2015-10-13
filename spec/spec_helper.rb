@@ -1,6 +1,11 @@
 require 'rspec'
+require 'pry'
+require 'socket'
+
 require 'card'
 require 'deck'
 require 'player'
 require 'game'
-require 'pry'
+require 'war_server'
+require 'mock_war_client'
+require 'client'

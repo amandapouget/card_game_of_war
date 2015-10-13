@@ -1,0 +1,38 @@
+require 'spec_helper'
+
+def capture_stdout(&block)
+  old = $stdout
+  $stdout = fake = StringIO.new
+  block.call
+  fake.string
+ensure
+  $stdout = old
+end
+
+describe WarServer do
+  context do
+    let(:server) { WarServer.new(port: 2000)}
+
+    describe '#initialize' do
+      it 'creates a WarServer object with a server' do
+        expect(server).to be_a WarServer
+      end
+    end
+
+    describe '#start' do
+      it 'starts up the server and thread' do
+        server_thread = Thread.new { WarServer.new(port: 2000).start }
+        client = MockWarClient.new(port: 2000)
+        client.capture_output
+        expect(client.output).to eq "Welcome to war!\n"
+      end
+    end
+
+    describe '#ask_for_name' do
+      it 'asks for the players name, gets it, and returns it' do
+        output = capture_stdout { server.ask_for_name }
+        expect(output).to eq "What is your name?\n"
+      end
+    end
+  end
+end
