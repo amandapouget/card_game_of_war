@@ -117,19 +117,5 @@ describe WarServer do
         expect(@server.socket.closed?).to be true
       end
     end
-
-    context 'now the two players are paired' do
-      before :each do
-        @server.pair_players(client_socket: @client_socket)
-        @server.pair_players(client_socket: @client2_socket)
-      end
-
-      describe '#ask_for_name' do
-        it 'asks the client for the players name' do
-          expect(@server.pending_clients.length).to eq 0
-          expect(@server.clients).to eq [@client_socket, @client2_socket]
-        end
-      end
-    end
   end
 end

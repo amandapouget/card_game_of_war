@@ -52,12 +52,12 @@ class WarServer
     ask_for_name(client: client2)
     player2_name = get_name(client: client2)
     player2 = Player.new(name: player2_name)
-
     game = Game.new(player1: player1, player2: player2)
     #play rounds [print stuff to client, get next move?]
     #until game is over
     #declare winner
-    #close connections
+    stop_connection(client1)
+    stop_connection(client2)
   end
 
   def stop_connection(client_socket:)
