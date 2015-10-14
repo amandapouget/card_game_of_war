@@ -2,13 +2,14 @@ require 'socket'
 require 'pry'
 
 class WarServer
-  attr_accessor :port, :socket, :pending_clients, :clients
+  attr_accessor :port, :socket, :pending_clients, :clients, :game
 
   def initialize(port: 2000)
     @port = port
     @socket = TCPServer.open('localhost', port)
     @pending_clients = []
     @clients = []
+    @game = nil
   end
 
   def start
@@ -27,7 +28,6 @@ class WarServer
       player2_socket = @pending_clients[1]
       @clients << @pending_clients.shift
       @clients << @pending_clients.shift
-      #play_game(client1: player1_socket, client2: player2_socket)
     end
   end
 
@@ -37,27 +37,52 @@ class WarServer
 
   def get_name(client_socket:)
     begin
-      client_socket.read_nonblock(1000)
+      client_socket.read_nonblock(1000).chomp
     rescue IO::WaitReadable
       IO.select([client_socket])
       retry
     end
   end
 
-  def play_game(client1:, client2:)
-    ask_for_name(client: client1)
-    player1_name = get_name(client: client1)
+  def make_game
+    ask_for_name(client_socket: @clients[0])
+    player1_name = get_name(client_socket: @clients[0])
     player1 = Player.new(name: player1_name)
 
-    ask_for_name(client: client2)
-    player2_name = get_name(client: client2)
+    ask_for_name(client_socket: @clients[1])
+    player2_name = get_name(client_socket: @clients[1])
     player2 = Player.new(name: player2_name)
-    game = Game.new(player1: player1, player2: player2)
-    #play rounds [print stuff to client, get next move?]
-    #until game is over
-    #declare winner
-    stop_connection(client1)
-    stop_connection(client2)
+    #my_client = WarClient.new(player: player1, name: name, socket: client1)
+    @game = Game.new(player1: player1, player2: player2)
+  end
+
+  def run_game
+    @game.deal
+    while !@game.game_over?
+      round_winner = game.play_round
+      congratulate_round(winner: round_winner)
+    end
+    congratulate_game(winner: @game.declare_game_winner)
+  end
+
+  def congratulate_round(winner:)
+    if @game.player1 == winner
+      @clients[0].puts "You won!"
+      @clients[1].puts "You lost!"
+    else
+      @clients[0].puts "You lost!"
+      @clients[1].puts "You won!"
+    end
+  end
+
+  def congratulate_game(winner:)
+    if @game.player1 == winner
+      @clients[0].puts "You won the game!"
+      @clients[1].puts "You lost the game!"
+    else
+      @clients[0].puts "You lost the game!"
+      @clients[1].puts "You won the game!"
+    end
   end
 
   def stop_connection(client_socket:)
@@ -66,7 +91,7 @@ class WarServer
     client_socket.close unless client_socket.closed?
   end
 
-  def stop_server
+  def stop_server # question about Enumerable iteration: refreshes the array inbetween iterations for Amanda but not for Roy
     connections = []
     @clients.each { |client| connections << client }
     @pending_clients.each { |client| connections << client }

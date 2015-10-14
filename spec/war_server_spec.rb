@@ -73,6 +73,61 @@ describe WarServer do
       end
     end
 
+    describe '#make_game' do
+      it 'returns a game made from clients[0] and clients[1]' do
+        @server.clients << @client_socket
+        @server.clients << @client2_socket
+        @client.provide_input("Amanda")
+        @client2.provide_input("Vianney")
+        expect(@server.make_game).to be_a Game
+      end
+    end
+
+    context 'game is made' do
+      before :each do
+        @server.clients << @client_socket
+        @server.clients << @client2_socket
+        @client.provide_input("Amanda")
+        @client2.provide_input("Vianney")
+        @game = @server.make_game
+      end
+
+      describe '#run_game' do
+        it 'calls game.deal and plays the game until over' do
+          expect(@game.deck.count_cards).to eq 52
+          @server.run_game
+          expect(@game.deck.count_cards).to eq 0
+          expect(@game.game_over?).to be true
+        end
+      end
+
+      describe '#congratulate_round' do
+        it 'congratulates only the winner' do
+          @server.congratulate_round(winner: @game.player1)
+          expect(@client.output).to include "You won!"
+          expect(@client2.output).not_to include "You won!"
+        end
+        it 'condolences only the loser' do
+          @server.congratulate_round(winner: @game.player2)
+          expect(@client.output).to include "You lost!"
+          expect(@client2.output).not_to include "You lost!"
+        end
+      end
+
+      describe '#declare_game_winner' do
+        it 'congratulates only the game winner' do
+          @server.congratulate_game(winner: @game.player1)
+          expect(@client.output).to include "You won the game!"
+          expect(@client2.output).not_to include "You won the game!"
+        end
+        it 'condolences only the game loser' do
+          @server.congratulate_game(winner: @game.player2)
+          expect(@client.output).to include "You lost the game!"
+          expect(@client2.output).not_to include "You lost the game!"
+        end
+      end
+    end
+
     describe '#stop_connection' do
       it 'closes the client connection to the server unless client already closed' do
         expect(@client_socket.closed?).to be false
