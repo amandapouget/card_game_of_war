@@ -21,14 +21,14 @@ class WarServer
 
   def pair_players(client_socket:)
     client_socket.puts "Welcome to war! I will connect you with your partner..."
-    #@pending_clients << client_socket
-    #if @pending_clients.length == 2
-  #    player1_socket = @pending_clients[0]
-  #    player2_socket = @pending_clients[1]
-  #    @clients << @pending_clients.shift
-  #    @clients << @pending_clients.shift
-      #play_game(client1: player1_socket, client2: player2_socket)
-  #  end
+    @pending_clients << client_socket
+    if @pending_clients.length == 2
+      player1_socket = @pending_clients[0]
+      player2_socket = @pending_clients[1]
+      @clients << @pending_clients.shift
+      @clients << @pending_clients.shift
+      play_game(client1: player1_socket, client2: player2_socket)
+    end
   end
 
   def ask_for_name(client:)

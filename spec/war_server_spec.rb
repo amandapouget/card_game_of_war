@@ -19,43 +19,61 @@ describe WarServer do
       expect(server.socket).to be_a TCPServer
       expect(server.pending_clients).to eq []
       expect(server.clients).to eq []
+      server.socket.close
     end
   end
 
-  before do
-    @server = WarServer.new
-    @server.socket.listen(5)
-    @client = MockWarClient.new
-    @client_socket = @server.socket.accept
-  end
-
-  after do
-    @server.socket.close
-    @client_socket.close
-  end
-
-  describe '#pair_players(client)' do
-    it 'welcomes the player' do
-      @server.pair_players(client_socket: @client_socket)
-      @client.capture_output
-      expect(@client.output).to include "Welcome to war!"
+  context 'server and two clients created and connected' do
+    before :each do
+      @server = WarServer.new
+      @server.socket.listen(5)
+      @client = MockWarClient.new
+      @client2 = MockWarClient.new
+      @client_socket = @server.socket.accept
+      @client2_socket = @server.socket.accept
     end
 
-    it 'increases either pending clients by 1 or clients by 2' do
-      @server.pair_players(client_socket: @client_socket)
-      @client.capture_output
-      expect(@client.output).to include "Welcome to war!"
+    after :each do
+      @client_socket.close
+      @client2_socket.close
+      @server.socket.close
+    end
+
+    describe '#pair_players(client)' do
+      it 'welcomes the player' do
+        @server.pair_players(client_socket: @client_socket)
+        @client.capture_output
+        expect(@client.output).to include "Welcome to war!"
+      end
+
+      it 'puts first player in pending clients' do
+        @server.pair_players(client_socket: @client_socket)
+        expect(@server.pending_clients[0]).to eq @client_socket
+      end
+
+      it 'when second player joins, moves first player to clients with second player' do
+        @server.pair_players(client_socket: @client_socket)
+        @server.pair_players(client_socket: @client2_socket)
+        expect(@server.pending_clients.length).to eq 0
+        expect(@server.clients).to eq [@client_socket, @client2_socket]
+      end
+    end
+
+    context 'now the two players are paired' do
+      before :each do
+        @server.pair_players(client_socket: @client_socket)
+        @server.pair_players(client_socket: @client2_socket)
+      end
+
+      describe '#ask_for_name' do
+        it 'asks the client for the players name' do
+          expect(@server.pending_clients.length).to eq 0
+          expect(@server.clients).to eq [@client_socket, @client2_socket]
+        end
+      end
     end
   end
 =begin
-  describe '#ask_for_name' do
-    it 'asks for the players name, gets it, and returns it' do
-      server = WarServer.new
-      output = capture_stdout { server.ask_for_name(client: $stdout) }
-      expect(output).to eq "What is your name?\n"
-    end
-  end
-
   describe '#get_name' do
     it 'returns the name as a string' do #needs work
       server = WarServer.new
