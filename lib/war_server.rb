@@ -27,16 +27,21 @@ class WarServer
       player2_socket = @pending_clients[1]
       @clients << @pending_clients.shift
       @clients << @pending_clients.shift
-      play_game(client1: player1_socket, client2: player2_socket)
+      #play_game(client1: player1_socket, client2: player2_socket)
     end
   end
 
-  def ask_for_name(client:)
-    client.puts "What is your name?"
+  def ask_for_name(client_socket:)
+    client_socket.puts "What is your name?"
   end
 
-  def get_name(client:)
-
+  def get_name(client_socket:)
+    begin
+      client_socket.read_nonblock(1000)
+    rescue IO::WaitReadable
+      IO.select([client_socket])
+      retry
+    end
   end
 
   def play_game(client1:, client2:)

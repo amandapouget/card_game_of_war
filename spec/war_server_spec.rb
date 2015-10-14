@@ -60,8 +60,16 @@ describe WarServer do
 
     describe '#ask_for_name' do
       it 'asks the client for the players name' do
-        @server.ask_for_name(client: @client_socket)
+        @server.ask_for_name(client_socket: @client_socket)
         expect(@client.output).to include "What is your name?"
+      end
+    end
+
+    describe '#get_name' do
+      it 'returns the name as a string' do #needs work
+        @client.provide_input("Amanda")
+        name = @server.get_name(client_socket: @client_socket)
+        expect(name).to eq "Amanda"
       end
     end
 
@@ -79,16 +87,9 @@ describe WarServer do
       end
     end
   end
-=begin
-  describe '#get_name' do
-    it 'returns the name as a string' do #needs work
-      server = WarServer.new
-      client = MockWarClient.new
-      puts client
-      puts server.ask_for_name(client: client)
-    end
-  end
 
+
+=begin
   describe '#pair_players' do
     it 'when there are two pending clients connected, match them and then start game' do
       server = WarServer.new(port: 2004)
