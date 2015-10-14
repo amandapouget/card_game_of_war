@@ -42,7 +42,6 @@ describe WarServer do
     describe '#pair_players(client)' do
       it 'welcomes the player' do
         @server.pair_players(client_socket: @client_socket)
-        @client.capture_output
         expect(@client.output).to include "Welcome to war!"
       end
 
@@ -56,6 +55,13 @@ describe WarServer do
         @server.pair_players(client_socket: @client2_socket)
         expect(@server.pending_clients.length).to eq 0
         expect(@server.clients).to eq [@client_socket, @client2_socket]
+      end
+    end
+
+    describe '#ask_for_name' do
+      it 'asks the client for the players name' do
+        @server.ask_for_name(client: @client_socket)
+        expect(@client.output).to include "What is your name?"
       end
     end
 

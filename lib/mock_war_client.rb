@@ -2,7 +2,6 @@ require 'socket'
 
 class MockWarClient
   attr_reader :socket
-  attr_reader :output
 
   def initialize(port: 2000)
     @socket = TCPSocket.open('localhost', port)
@@ -14,8 +13,13 @@ class MockWarClient
 
   def capture_output(delay=0.1)
     sleep(delay)
-    @output = @socket.read_nonblock(1000)
+    @my_output = @socket.read_nonblock(1000)
   rescue IO::WaitReadable
-    @output = ""
+    @my_output = ""
+  end
+
+  def output
+    capture_output
+    @my_output
   end
 end
