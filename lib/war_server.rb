@@ -60,11 +60,19 @@ class WarServer
     #close connections
   end
 
-  def stop_connection(client)
-    client.close
+  def stop_connection(client_socket:)
+    @clients.delete(client_socket)
+    @pending_clients.delete(client_socket)
+    client_socket.close unless client_socket.closed?
   end
 
-  def stop_all_connections(clients)
-    clients.each { |client| stop_connection(client) }
+  def stop_all_connections(client_sockets:)
+    client_sockets.each { |client_socket| stop_connection(client_socket) unless client_socket.closed? }
+  end
+
+  def stop_server
+    @clients.each { |client| stop_connection(client_socket: client) }
+    @pending_clients.each { |client| stop_connection(client_socket: client) }
+    @server.close unless @server.closed?
   end
 end

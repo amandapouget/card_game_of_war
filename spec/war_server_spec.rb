@@ -34,9 +34,9 @@ describe WarServer do
     end
 
     after :each do
-      @client_socket.close
-      @client2_socket.close
-      @server.socket.close
+      @client_socket.close unless @client_socket.closed?
+      @client2_socket.close unless @client2_socket.closed?
+      @server.socket.close unless @server.socket.closed?
     end
 
     describe '#pair_players(client)' do
@@ -73,6 +73,32 @@ describe WarServer do
       end
     end
 
+    describe '#stop_connection' do
+      it 'closes the client connection to the server unless client already closed' do
+        expect(@client_socket.closed?).to be false
+        @server.stop_connection(client_socket: @client_socket)
+        expect(@client_socket.closed?).to be true
+      end
+
+      it 'removes the connection from pending clients if it is in pending clients' do
+        @server.pending_clients << @client_socket
+        expect(@server.pending_clients.include?(@client_socket)).to be true
+        @server.stop_connection(client_socket: @client_socket)
+        expect(@server.pending_clients.include?(@client_socket)).to be false
+      end
+
+      it 'removes the connection from clients if it is in clients' do
+        @server.clients << @client_socket
+        expect(@server.clients.include?(@client_socket)).to be true
+        @server.stop_connection(client_socket: @client_socket)
+        expect(@server.clients.include?(@client_socket)).to be false
+      end
+    end
+
+    describe '#stop_all_connections' do
+
+    end
+
     context 'now the two players are paired' do
       before :each do
         @server.pair_players(client_socket: @client_socket)
@@ -87,37 +113,4 @@ describe WarServer do
       end
     end
   end
-
-
-=begin
-  describe '#pair_players' do
-    it 'when there are two pending clients connected, match them and then start game' do
-      server = WarServer.new(port: 2004)
-      client = MockWarClient.new(port: 2004)
-      client2 = MockWarClient.new(port: 2004)
-      sleep(1) # if I don't include this line, rspec finishes before the clients have a chance to connect and get added to @clients
-      expect(server.clients.length).to eq 2
-      client.capture_output
-      expect(client.output).to eq ("Welcome to war!\n")
-    end
-  end
-
-  describe '#kill' do
-    it 'gracefully closes each client connection' do
-      server = WarServer.new(port: 2005)
-      client1 = MockWarClient.new(port: 2005)
-      client2 = MockWarClient.new(port: 2005)
-      server.clients << client1.socket
-      server.clients << client2.socket
-      server.kill_server
-      expect(client1.socket.closed?).to be true
-    end
-    it 'kills the servers running thread that began in the start method' do
-      server = WarServer.new(port: 2005)
-      server.start
-      server.kill_server
-      expect(server.running?).to be false
-    end
-  end
-=end
 end
