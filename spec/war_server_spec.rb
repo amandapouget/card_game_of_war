@@ -95,8 +95,27 @@ describe WarServer do
       end
     end
 
-    describe '#stop_all_connections' do
+    describe '#stop_server' do
+      it 'closes all the connections in clients' do
+        @server.clients << @client_socket
+        @server.clients << @client2_socket
+        @server.stop_server
+        expect(@client_socket.closed?).to be true
+        expect(@client2_socket.closed?).to be true
+      end
 
+      it 'closes all the connections in pending clients' do
+        @server.pending_clients << @client_socket
+        @server.pending_clients << @client2_socket
+        @server.stop_server
+        expect(@client_socket.closed?).to be true
+        expect(@client2_socket.closed?).to be true
+      end
+
+      it 'closes the server socket' do
+        @server.stop_server
+        expect(@server.socket.closed?).to be true
+      end
     end
 
     context 'now the two players are paired' do

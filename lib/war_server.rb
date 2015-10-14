@@ -66,13 +66,11 @@ class WarServer
     client_socket.close unless client_socket.closed?
   end
 
-  def stop_all_connections(client_sockets:)
-    client_sockets.each { |client_socket| stop_connection(client_socket) unless client_socket.closed? }
-  end
-
   def stop_server
-    @clients.each { |client| stop_connection(client_socket: client) }
-    @pending_clients.each { |client| stop_connection(client_socket: client) }
-    @server.close unless @server.closed?
+    connections = []
+    @clients.each { |client| connections << client }
+    @pending_clients.each { |client| connections << client }
+    connections.each { |client| stop_connection(client_socket: client) }
+    @socket.close unless @socket.closed?
   end
 end
