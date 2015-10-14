@@ -13,25 +13,22 @@ class WarServer
 
   def start
     loop do
-      Thread.start(@socket.accept) do |client|
-        pair_players(client)
+      Thread.start(@socket.accept) do |client_socket|
+        pair_players(client_socket)
       end
     end
   end
 
-  def pair_players(client)
-    client.puts 'Welcome to war!'
-    ask_for_name(client: client)
-    name = get_name(client: client)
-    # have to make a way to store the name and the client together
-    @pending_clients << client
-    if @pending_clients.length == 2
-      player1_socket = @pending_clients[0]
-      player2_socket = @pending_clients[1]
-      @clients << @pending_clients.shift
-      @clients << @pending_clients.shift
-      play_game(client1: player1_socket, client2: player2_socket)
-    end
+  def pair_players(client_socket:)
+    client_socket.puts "Welcome to war! I will connect you with your partner..."
+    #@pending_clients << client_socket
+    #if @pending_clients.length == 2
+  #    player1_socket = @pending_clients[0]
+  #    player2_socket = @pending_clients[1]
+  #    @clients << @pending_clients.shift
+  #    @clients << @pending_clients.shift
+      #play_game(client1: player1_socket, client2: player2_socket)
+  #  end
   end
 
   def ask_for_name(client:)

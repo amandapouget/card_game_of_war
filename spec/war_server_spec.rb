@@ -22,6 +22,32 @@ describe WarServer do
     end
   end
 
+  before do
+    @server = WarServer.new
+    @server.socket.listen(5)
+    @client = MockWarClient.new
+    @client_socket = @server.socket.accept
+  end
+
+  after do
+    @server.socket.close
+    @client_socket.close
+  end
+
+  describe '#pair_players(client)' do
+    it 'welcomes the player' do
+      @server.pair_players(client_socket: @client_socket)
+      @client.capture_output
+      expect(@client.output).to include "Welcome to war!"
+    end
+
+    it 'increases either pending clients by 1 or clients by 2' do
+      @server.pair_players(client_socket: @client_socket)
+      @client.capture_output
+      expect(@client.output).to include "Welcome to war!"
+    end
+  end
+=begin
   describe '#ask_for_name' do
     it 'asks for the players name, gets it, and returns it' do
       server = WarServer.new
@@ -68,4 +94,5 @@ describe WarServer do
       expect(server.running?).to be false
     end
   end
+=end
 end
