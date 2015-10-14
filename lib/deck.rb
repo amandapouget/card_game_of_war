@@ -1,4 +1,4 @@
-require 'card'
+require './lib/card.rb'
 
 class Deck
   attr_reader :cards, :type

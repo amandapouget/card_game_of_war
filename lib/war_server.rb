@@ -1,5 +1,8 @@
 require 'socket'
-require 'pry'
+require_relative './game'
+require_relative './player'
+require_relative './deck'
+require_relative './card'
 
 class WarServer
   attr_accessor :port, :socket, :pending_clients, :clients, :game
@@ -15,7 +18,14 @@ class WarServer
   def start
     loop do
       Thread.start(@socket.accept) do |client_socket|
-        pair_players(client_socket)
+        pair_players(client_socket: client_socket)
+        if @clients.length == 2
+          make_game
+          run_game
+          stop_connection(client_socket: @clients[0])
+          stop_connection(client_socket: @clients[0])
+        end
+        # Need a Thread.kill here?
       end
     end
   end

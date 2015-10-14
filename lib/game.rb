@@ -1,4 +1,4 @@
-require 'deck'
+require './lib/deck.rb'
 
 class Game
 

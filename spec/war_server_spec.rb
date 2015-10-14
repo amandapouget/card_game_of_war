@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'pry'
 
 def capture_stdout(&block)
   old = $stdout
@@ -114,7 +113,7 @@ describe WarServer do
         end
       end
 
-      describe '#declare_game_winner' do
+      describe '#congratulate_game' do
         it 'congratulates only the game winner' do
           @server.congratulate_game(winner: @game.player1)
           expect(@client.output).to include "You won the game!"
