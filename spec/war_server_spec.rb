@@ -25,7 +25,6 @@ describe WarServer do
   context 'server and two clients created and connected' do
     before :each do
       @server = WarServer.new
-      @server.socket.listen(5)
       @client = MockWarClient.new
       @client2 = MockWarClient.new
       @client_socket = @server.socket.accept
@@ -33,9 +32,7 @@ describe WarServer do
     end
 
     after :each do
-      @client_socket.close unless @client_socket.closed?
-      @client2_socket.close unless @client2_socket.closed?
-      @server.socket.close unless @server.socket.closed?
+      @server.stop_server
     end
 
     describe '#pair_players(client)' do

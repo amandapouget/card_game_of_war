@@ -4,6 +4,21 @@ require_relative './player'
 require_relative './deck'
 require_relative './card'
 
+# use hash for client - player relationship
+# write tests for behaviors not tests for methods
+# find a way to spit back the state of the game between rounds to the client
+# the tests should tell me how to use the class not how to use each method of the class
+# put "protected" on far left ahead of all methods that someone USING the class should not be able to access. In Ken's example, only start, run, stop... are accessible.
+# how to call a protected method from inside a test: server.send(:my_protected_method)
+# but if you can so easily skirt protected, what is its purpose?
+# the outside world can't access your code, only what you make available through API
+# the purpose of protecting something is to inform the developer of things that they probably shouldn't include in the API.
+# let(:symbol) is generally for variable declaration.... if you have:
+# let(:do_it) { call my method and do stuff in here } and then somewhere in your tests, you call:
+#   do_it
+#   do_it
+# it won't execute the second time because let only executes one time; the second time it decides not to because it already did that.... instead, use a helper method
+
 class WarServer
   attr_accessor :port, :socket, :pending_clients, :clients, :game
 
@@ -101,7 +116,7 @@ class WarServer
     client_socket.close unless client_socket.closed?
   end
 
-  def stop_server # question about Enumerable iteration: refreshes the array inbetween iterations for Amanda but not for Roy
+  def stop_server
     connections = []
     @clients.each { |client| connections << client }
     @pending_clients.each { |client| connections << client }

@@ -1,4 +1,18 @@
 =begin
+example client outline
+until socket is closed
+  begin
+    sleep
+    @output = @socket.read_nonblock(1000)
+  rescue wait readable
+    next (or retry)
+  end
+  puts @output
+  @socket.puts gets if @output =~ /enter/
+end
+=end
+
+=begin
 require 'socket'      # Sockets are in standard library
 
 hostname = 'localhost'
