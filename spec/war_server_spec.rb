@@ -193,7 +193,6 @@ describe WarServer do
         player1.add_card(card_as)
         player2.add_card(card_js)
         @server.play_game(@match)
-        expect(game.deck.count_cards).to eq 0
         expect(game.game_over?).to be true
       end
     end
