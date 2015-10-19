@@ -242,52 +242,50 @@ describe WarServer do
         expect(@client2.output).not_to include "You lost the game!"
       end
     end
+
+    describe '#stop_connection' do
+      it 'closes the client connection to the server unless client already closed' do
+        expect(@client_socket.closed?).to be false
+        @server.stop_connection(client_socket: @client_socket)
+        expect(@client_socket.closed?).to be true
+      end
+
+      it 'removes the connection from pending clients if it is in pending clients' do
+        @server.pending_clients << @client_socket
+        expect(@server.pending_clients.include?(@client_socket)).to be true
+        @server.stop_connection(client_socket: @client_socket)
+        expect(@server.pending_clients.include?(@client_socket)).to be false
+      end
+
+      it 'removes the connection from clients if it is in clients' do
+        @server.clients << @client_socket
+        expect(@server.clients.include?(@client_socket)).to be true
+        @server.stop_connection(client_socket: @client_socket)
+        expect(@server.clients.include?(@client_socket)).to be false
+      end
+    end
+
+    describe '#stop_server' do
+      it 'closes all the connections in clients' do
+        @server.clients << @client_socket
+        @server.clients << @client2_socket
+        @server.stop_server
+        expect(@client_socket.closed?).to be true
+        expect(@client2_socket.closed?).to be true
+      end
+
+      it 'closes all the connections in pending clients' do
+        @server.pending_clients << @client_socket
+        @server.pending_clients << @client2_socket
+        @server.stop_server
+        expect(@client_socket.closed?).to be true
+        expect(@client2_socket.closed?).to be true
+      end
+
+      it 'closes the server socket' do
+        @server.stop_server
+        expect(@server.socket.closed?).to be true
+      end
+    end
   end
 end
-=begin
-  describe '#stop_connection' do
-    it 'closes the client connection to the server unless client already closed' do
-      expect(@client_socket.closed?).to be false
-      @server.stop_connection(client_socket: @client_socket)
-      expect(@client_socket.closed?).to be true
-    end
-
-    it 'removes the connection from pending clients if it is in pending clients' do
-      @server.pending_clients << @client_socket
-      expect(@server.pending_clients.include?(@client_socket)).to be true
-      @server.stop_connection(client_socket: @client_socket)
-      expect(@server.pending_clients.include?(@client_socket)).to be false
-    end
-
-    it 'removes the connection from clients if it is in clients' do
-      @server.clients << @client_socket
-      expect(@server.clients.include?(@client_socket)).to be true
-      @server.stop_connection(client_socket: @client_socket)
-      expect(@server.clients.include?(@client_socket)).to be false
-    end
-  end
-
-  describe '#stop_server' do
-    it 'closes all the connections in clients' do
-      @server.clients << @client_socket
-      @server.clients << @client2_socket
-      @server.stop_server
-      expect(@client_socket.closed?).to be true
-      expect(@client2_socket.closed?).to be true
-    end
-
-    it 'closes all the connections in pending clients' do
-      @server.pending_clients << @client_socket
-      @server.pending_clients << @client2_socket
-      @server.stop_server
-      expect(@client_socket.closed?).to be true
-      expect(@client2_socket.closed?).to be true
-    end
-
-    it 'closes the server socket' do
-      @server.stop_server
-      expect(@server.socket.closed?).to be true
-    end
-  end
-end
-=end
