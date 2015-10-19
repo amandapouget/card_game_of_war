@@ -20,34 +20,27 @@ class Game
     end
   end
 
-  def play_round(cards_bet = [])
-    return declare_game_winner if game_over?
-    cards_on_table = cards_bet
-    player1_card = player1.play_next_card
-    player2_card = player2.play_next_card
-    cards_on_table << player1_card
-    cards_on_table << player2_card
+  def play_cards(cards = { @player1 => [], @player2 => [] })
+    cards[@player1] << player1.play_next_card
+    cards[@player2] << player2.play_next_card
+    @rounds_played += 1
+    return cards
+  end
 
-    if player1_card.rank_value > player2_card.rank_value
-      cards_on_table.shuffle!
-      winner = player1
-      winner.collect_winnings(cards_on_table)
-      @rounds_played += 1
-      return winner
-    elsif player2_card.rank_value > player1_card.rank_value
-      cards_on_table.shuffle!
-      winner = player2
-      winner.collect_winnings(cards_on_table)
-      @rounds_played += 1
-      return winner
-    elsif game_over?
-      @rounds_played += 1
-      return declare_game_winner
-    else
-      cards_on_table << player1.play_next_card
-      cards_on_table << player2.play_next_card
-      winner = play_round(cards_on_table)
-    end
+  def determine_winner(cards_bet:)
+    player1_cards = cards_bet[@player1]
+    player2_cards = cards_bet[@player2]
+    return @player1 if player1_cards.last.rank_value > player2_cards.last.rank_value
+    return @player2 if player2_cards.last.rank_value > player1_cards.last.rank_value
+    return "war"
+  end
+
+  def get_winnings(cards_bet:)
+    winnings = []
+    cards_bet[@player1].each { |card| winnings << card }
+    cards_bet[@player2].each { |card| winnings << card }
+    winnings.shuffle!
+    return winnings
   end
 
   def declare_game_winner
