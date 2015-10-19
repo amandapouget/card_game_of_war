@@ -219,12 +219,12 @@ describe WarServer do
 
     describe '#congratulate_round' do
       it 'congratulates only the winner' do
-        @server.congratulate_round(winner: @game.player1)
+        @server.congratulate_round(match: @match, winner: game.player1)
         expect(@client.output).to include "You won!"
         expect(@client2.output).not_to include "You won!"
       end
       it 'condolences only the loser' do
-        @server.congratulate_round(winner: @game.player2)
+        @server.congratulate_round(match: @match, winner: game.player2)
         expect(@client.output).to include "You lost!"
         expect(@client2.output).not_to include "You lost!"
       end
