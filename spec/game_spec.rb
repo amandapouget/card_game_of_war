@@ -30,14 +30,43 @@ describe Game do
       end
     end
 
+    describe ("#play_round") do
+      it 'returns game winner if the game is over' do
+        player1.add_card(card_js)
+        expect(game.play_round).to eq player1
+      end
+
+      it 'increments rounds_played by 1' do
+        player1.add_card(card_js)
+        player2.add_card(card_ad)
+        game.play_round
+        expect(game.rounds_played).to eq 1
+      end
+
+      it 'returns round winner if no war' do
+        player1.add_card(card_ad)
+        player2.add_card(card_js)
+        expect(game.play_round).to eq player1
+      end
+
+      it 'plays war until a winner is found' do
+        10.times do
+          player1.add_card(card_ks)
+          player2.add_card(card_kh)
+        end
+        player1.add_card(card_js)
+        player2.add_card(card_ad)
+        expect(game.play_round).to eq player2
+      end
+    end
+
     describe '#play_cards' do
-      it 'returns the card played by each player and increments rounds_played' do
+      it 'returns the card played by each player' do
         player1.add_card(card_js)
         player2.add_card(card_ad)
         cards = game.play_cards
         expect(cards[player1]).to eq [card_js]
         expect(cards[player2]).to eq [card_ad]
-        expect(game.rounds_played).to eq 1
       end
     end
 
