@@ -229,23 +229,22 @@ describe WarServer do
         expect(@client2.output).not_to include "You lost!"
       end
     end
-  end
-end
-=begin
+
     describe '#congratulate_game' do
       it 'congratulates only the game winner' do
-        @server.congratulate_game(winner: @game.player1)
+        @server.congratulate_game(match: @match, winner: game.player1)
         expect(@client.output).to include "You won the game!"
         expect(@client2.output).not_to include "You won the game!"
       end
       it 'condolences only the game loser' do
-        @server.congratulate_game(winner: @game.player2)
+        @server.congratulate_game(match: @match, winner: game.player2)
         expect(@client.output).to include "You lost the game!"
         expect(@client2.output).not_to include "You lost the game!"
       end
     end
   end
-
+end
+=begin
   describe '#stop_connection' do
     it 'closes the client connection to the server unless client already closed' do
       expect(@client_socket.closed?).to be false
