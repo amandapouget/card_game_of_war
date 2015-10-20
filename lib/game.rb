@@ -1,14 +1,15 @@
 require './lib/deck.rb'
+require './lib/round_result.rb'
 
 class Game
-
-  attr_accessor :player1, :player2, :deck, :winner, :rounds_played
+  attr_accessor :player1, :player2, :deck, :winner, :loser, :rounds_played
 
   def initialize(player1:, player2:)
     @player1 = player1
     @player2 = player2
     @deck = Deck.new(type: 'regular')
     @winner = nil
+    @loser = nil
     @rounds_played = 0
   end
 
@@ -20,29 +21,18 @@ class Game
     end
   end
 
-  def play_round(state = nil)
-    return declare_game_winner if game_over?
+  def play_round # what beautiful dry code we have!
+    return RoundResult.new(winner: game_winner, loser: game_loser) if game_over?
     @rounds_played += 1
     cards = play_cards
-    yield(cards, match: match, point_in_round: "post-play") if state
-    winner = determine_winner(cards_bet: cards)
-    if !(winner=="war")
-      winner.collect_winnings(get_winnings(cards_bet: cards))
-      return winner
-    end
-    while winner == "war"
+    while round_winner(cards) == "war"
       2.times do
-        return declare_game_winner if game_over?
-        new_cards = play_cards
-        cards[@player1] << new_cards[@player1][0]
-        cards[@player2] << new_cards[@player2][0]
+        return RoundResult.new(winner: game_winner, loser: game_loser, cards: cards) if game_over?
+        cards = play_cards(cards)
       end
-      yield(cards, match: match, point_in_round: "post-play") if state
-      winner = determine_winner(cards_bet: cards)
     end
-    yield(cards, match: match, point_in_round: "post-play") if state
-    winner.collect_winnings(get_winnings(cards_bet: cards))
-    return winner
+    round_winner(cards).collect_winnings(get_winnings(cards))
+    return RoundResult.new(winner: round_winner(cards), loser: round_loser(cards), cards: cards)
   end
 
   def play_cards(cards = { @player1 => [], @player2 => [] })
@@ -51,26 +41,36 @@ class Game
     return cards
   end
 
-  def determine_winner(cards_bet:)
-    player1_cards = cards_bet[@player1]
-    player2_cards = cards_bet[@player2]
-    return @player1 if player1_cards.last.rank_value > player2_cards.last.rank_value
-    return @player2 if player2_cards.last.rank_value > player1_cards.last.rank_value
+  def round_winner(cards)
+    return @player1 if cards[@player1].last.rank_value > cards[@player2].last.rank_value
+    return @player2 if cards[@player2].last.rank_value > cards[@player1].last.rank_value
     return "war"
   end
 
-  def get_winnings(cards_bet:)
+  def round_loser(cards)
+    return @player2 if cards[@player1].last.rank_value > cards[@player2].last.rank_value
+    return @player1 if cards[@player2].last.rank_value > cards[@player1].last.rank_value
+    return "war"
+  end
+
+  def get_winnings(cards)
     winnings = []
-    cards_bet[@player1].each { |card| winnings << card }
-    cards_bet[@player2].each { |card| winnings << card }
+    cards[@player1].each { |card| winnings << card }
+    cards[@player2].each { |card| winnings << card }
     winnings.shuffle!
     return winnings
   end
 
-  def declare_game_winner
+  def game_winner
     @winner = player1 if player2.out_of_cards?
     @winner = player2 if player1.out_of_cards?
     @winner
+  end
+
+  def game_loser
+    @loser = player2 if player2.out_of_cards?
+    @loser = player1 if player1.out_of_cards?
+    @loser
   end
 
   def game_over?

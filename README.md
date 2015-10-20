@@ -33,6 +33,20 @@ game
   C: start game, declare winner of round, declare winner of game
   I: who is playing, who won, when the game is over and who the winner is
 
+NOTES
+  # use hash for client - player relationship
+  # write tests for behaviors not tests for methods
+  # the tests should tell me how to use the class not how to use each method of the class
+  # put "protected" on far left ahead of all methods that someone USING the class should not be able to access. In Ken's example, only start, run, stop... are accessible.
+  # how to call a protected method from inside a test: server.send(:my_protected_method)
+  # but if you can so easily skirt protected, what is its purpose?
+  # the outside world can't access your code, only what you make available through API
+  # the purpose of protecting something is to inform the developer of things that they probably shouldn't include in the API.
+  # let(:symbol) is generally for variable declaration.... if you have:
+  # let(:do_it) { call my method and do stuff in here } and then somewhere in your tests, you call:
+  #   do_it
+  #   do_it
+  # it won't execute the second time because let only executes one time; the second time it decides not to because it already did that.... instead, use a helper method
 
 NEXT ASSIGNMENT
 --git familiar
