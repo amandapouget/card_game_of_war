@@ -15,4 +15,8 @@ class Card
   def ==(another_card)
     return rank == (another_card.rank) && suit == (another_card.suit)
   end
+
+  def to_s
+    rank + " of " + suit
+  end
 end

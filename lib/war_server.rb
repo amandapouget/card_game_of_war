@@ -1,8 +1,7 @@
 require 'socket'
+require 'json'
 require_relative './game'
 require_relative './player'
-require_relative './deck'
-require_relative './card'
 
 class WarServer
   attr_accessor :port, :socket, :pending_clients, :clients, :game
@@ -30,7 +29,7 @@ class WarServer
     client
   end
 
-  def run(client) # not tested ?
+  def run(client) # NOT TESTED
     if pair_players
       client1 = @clients.last
       client2 = @clients[@clients.length-2]
@@ -48,7 +47,7 @@ class WarServer
     player2 = Player.new(name: get_name(client2))
     game = Game.new(player1: player1, player2: player2)
     game.deal
-    match = { "game" => game, client1 => player1, client2 => player2 }
+    match = { "game" => game, "client1" => client1, "client2" => client2, client1 => player1, client2 => player2 }
   end
 
   def get_name(client)
@@ -76,18 +75,31 @@ class WarServer
   end
 
   def tell_starting_state(match)
+    #match_clients = [match["client1"], match["client2"]]
+    #match["game"].player1.name
+    #match_to_json = {
+
+
+    #}
+    #match_clients.each { |client| client.puts(JSON.dump(match)) }
   end
 
   def tell_ending_state(match, round_result)
+    #client.puts(JSON.dump(round_result.to_json))
+
+    #match_clients = [match["client1"], match["client2"]]
+    #match_clients.each { |client| client.puts(JSON.dump(match, round_result)) }
   end
 
   def congratulate_game(match)
+    #match_clients = [match["client1"], match["client2"]]
+    #match_clients.each { |client| client.puts(JSON.dump(match)) }
   end
 
-  def stop_connection(client_socket)
-    @clients.delete(client_socket)
-    @pending_clients.delete(client_socket)
-    client_socket.close unless client_socket.closed?
+  def stop_connection(client)
+    @clients.delete(client)
+    @pending_clients.delete(client)
+    client.close unless client.closed?
   end
 
   def stop_server

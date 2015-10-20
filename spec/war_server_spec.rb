@@ -36,138 +36,104 @@ describe WarServer do
       end
     end
 
-    describe '#start' do
-      it 'starts the server by giving it a TCP server and arrays of pending_clients and clients' do
+    context 'server started' do
+      before do
         @server.start
-        expect(@server.socket).to be_a TCPServer
-        expect(@server.pending_clients).to eq []
-        expect(@server.clients).to eq []
       end
 
-      it 'is listening when started and connects to a client' do
-        @server.start
-        @client.start
-        expect{ @client.start }.to_not raise_exception
-      end
-
-      it 'when started, connects to multiple clients at once' do
-        @server.start
-        @client.start
-        expect{ @client2.start }.to_not raise_exception
-      end
-    end
-
-    context 'server and two clients are started' do
-      before :each do
-        @server.start
-        @client.start
-        @client2.start
-      end
-
-      describe '#accept' do
-        it 'accepts the client and welcomes the player' do
-          client_socket = @server.accept
-          expect(@client.output).to include "Welcome to war!"
+      describe '#start' do
+        it 'starts the server by giving it a TCP server and arrays of pending_clients and clients' do
+          expect(@server.socket).to be_a TCPServer
+          expect(@server.pending_clients).to eq []
+          expect(@server.clients).to eq []
         end
 
-        it 'accepts two clients and welcomes both players' do
-          @server.accept
-          expect(@client.output).to include "Welcome to war!"
-          @server.accept
-          expect(@client2.output).to include "Welcome to war!"
+        it 'is listening when started and connects to a client' do
+          expect{ @client.start }.to_not raise_exception
         end
 
-        it 'adds the client to pending_clients' do
-          client_socket = @server.accept
-          @server.run(client_socket)
-          expect(@server.pending_clients[0]).to eq client_socket
+        it 'when started, connects to multiple clients at once' do
+          @client.start
+          expect{ @client2.start }.to_not raise_exception
         end
       end
 
-      describe '#pair_players' do
-        it 'returns false when only one player is connected' do
-          @server.accept
-          expect(@server.pair_players).to be_falsey
-        end
-      end
-
-      context 'two clients are accepted' do
-        before do
-          @client_socket = @server.accept
-          @client2_socket = @server.accept
+      context 'two clients are started' do
+        before :each do
+          @client.start
+          @client2.start
         end
 
-        describe '#run' do
-          it 'runs the game and then disconnects the clients when it is over' do
-            expect(@client_socket.closed?).to be false
-            expect(@client2_socket.closed?).to be false
-            @client.provide_input("Amanda")
-            @client2.provide_input("Vianney")
-            @server.run(@client1_socket)
-            @server.run(@client2_socket)
-            expect(@client_socket.closed?).to be true
-            expect(@client2_socket.closed?).to be true
+        describe '#accept' do
+          it 'accepts the client and welcomes the player' do
+            client_socket = @server.accept
+            expect(@client.output).to include "Welcome to war!"
+          end
+
+          it 'accepts two clients and welcomes both players' do
+            @server.accept
+            expect(@client.output).to include "Welcome to war!"
+            @server.accept
+            expect(@client2.output).to include "Welcome to war!"
+          end
+
+          it 'adds the client to pending_clients' do
+            client_socket = @server.accept
+            @server.run(client_socket)
+            expect(@server.pending_clients[0]).to eq client_socket
           end
         end
 
         describe '#pair_players' do
-          it 'when second player is accepted, moves first player and second player to clients and returns true' do
-            expect(@server.pair_players).to be_truthy
-            expect(@server.pending_clients.length).to eq 0
-            expect(@server.clients).to eq [@client_socket, @client2_socket]
+          it 'returns false when only one player is connected' do
+            @server.accept
+            expect(@server.pair_players).to be_falsey
           end
         end
 
-        context 'clients are paired' do
-          before :each do
-            @server.pair_players
+        context 'two clients are accepted' do
+          before do
+            @client_socket = @server.accept
+            @client2_socket = @server.accept
           end
 
-          describe '#get_name' do
-            it 'asks the client for the players name and returns it as a string' do
-              @client.provide_input("Amanda")
-              name = @server.get_name(@client_socket)
-              expect(@client.output).to include "What is your name?"
-              expect(name).to eq "Amanda"
+          describe '#pair_players' do
+            it 'when second player is accepted, moves first player and second player to clients and returns true' do
+              expect(@server.pair_players).to be_truthy
+              expect(@server.pending_clients.length).to eq 0
+              expect(@server.clients).to eq [@client_socket, @client2_socket]
             end
           end
 
-          describe '#make_game' do
-            it 'takes two client sockets, gets names, creates players and game with cards dealt and returns a hash of game and players corresponding to client sockets' do
-              @client.provide_input("Amanda")
-              @client2.provide_input("Vianney")
-              match = @server.make_game(@client_socket, @client2_socket)
-              expect(match).to be_a Hash
-              expect(match[@client_socket]).to be_a Player
-              expect(match[@client2_socket]).to be_a Player
-              expect(match[@client_socket].name).to eq "Amanda"
-              expect(match[@client2_socket].name).to eq "Vianney"
-              expect(match["game"]).to be_a Game
-            end
-          end
-
-          context 'game is made' do
+          context 'clients are paired' do
             before :each do
-              game = Game.new(player1: Player.new, player2: Player.new)
-              @match = { "game" => game, @client_socket => game.player1, @client2_socket => game.player2 }
-              @client.provide_input("\n")
-              @client2.provide_input("\n")
+              @server.pair_players
             end
 
-            let(:game) { @match["game"] }
-            let(:player1) { game.player1 }
-            let(:player2) { game.player2 }
-            let(:card_as) { Card.new(rank: "ace", suit: "spades") }
-            let(:card_js) { Card.new(rank: "jack", suit: "spades") }
-            let(:card_ad) { Card.new(rank: "ace", suit: "diamonds") }
-            let(:card_ks) { Card.new(rank: "king", suit: "spades") }
-            let(:card_kh) { Card.new(rank: "king", suit: "hearts") }
-            let(:card_2c) { Card.new(rank: "two", suit: "hearts")}
+            describe '#get_name' do
+              it 'asks the client for the players name and returns it as a string' do
+                @client.provide_input("Amanda")
+                name = @server.get_name(@client_socket)
+                expect(@client.output).to include "What is your name?"
+                expect(name).to eq "Amanda"
+              end
+            end
+
+            describe '#make_game' do
+              it 'takes two client sockets, gets names, creates players and game with cards dealt and returns a match object' do
+                @client.provide_input("Amanda")
+                @client2.provide_input("Vianney")
+                match = @server.make_game(@client_socket, @client2_socket)
+                expect(match).to be_a Match
+              end
+            end
 
             describe '#play_game' do
               it 'plays the game until over' do
-                player1.add_card(card_as)
-                player2.add_card(card_js)
+                game = Game.new(player1: Player.new, player2: Player.new)
+                @match = { "game" => game, "client1" => @client_socket, "client2" => @client2_socket, @client_socket => game.player1, @client2_socket => game.player2 } # Should use a match object?
+                game.player1.add_card(Card.new(rank: "ace", suit: "spades"))
+                game.player2.add_card(Card.new(rank: "jack", suit: "spades"))
                 @server.play_game(@match)
                 expect(game.game_over?).to be true
               end
