@@ -9,7 +9,7 @@ class WarClient
     # could put your JSON in here to load the welcome message and identifier given by accept in war_server
   end
 
-  def puts_welcome(delay=0.1)
+  def puts_message(delay=0.1)
     sleep(delay)
     begin
       message = @socket.read_nonblock(1000).chomp # Read lines from socket
@@ -19,10 +19,12 @@ class WarClient
     end
   end
 
-  def provide_input
-    @socket.puts(gets.chomp)
+  def provide_input(text)
+    @socket.puts(text)
   end
+end
 
+=begin
   def capture_output(delay=0.1)
     sleep(delay)
     @my_output = @socket.read_nonblock(1000)
@@ -41,7 +43,7 @@ class WarClient
   end
 end
 
-=begin
+
 def tell_player_state(client, player)
   client.puts "You have #{match.key(client).count_cards} cards. Hit any key to play round."
 end

@@ -13,10 +13,6 @@ describe WarClient do
     $stdout = old
   end
 
-  def provide_fake_input(text)
-    @socket.puts(text)
-  end
-
   it 'does nothing when initialized' do
     expect { client }.to_not raise_exception
   end
@@ -33,7 +29,7 @@ describe WarClient do
     before do
       server.start
       client.start
-      server.accept
+      @client_socket = server.accept
     end
 
     after do
@@ -45,15 +41,16 @@ describe WarClient do
     end
 
     it 'puts the welcome message to the client' do
-      putted = capture_stdout { client.puts_welcome }
+      putted = capture_stdout { client.puts_message }
       expect(putted).to match /.+/
     end
 
     it 'provides a unique identifier or hits enter for none' do
-      3
+      client.provide_input("yes")
+      expect(server.get_input(@client_socket)).to eq "yes"
     end
 
-    it 'if it hits enter, it receives back its new unique identifier' do
+    it 'if it gives an unlisted value, it receives back its new unique identifier' do
       3
     end
 

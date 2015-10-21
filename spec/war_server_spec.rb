@@ -145,39 +145,55 @@ describe WarServer do
 
 # ALL ABOVE PASS
 
-            describe '#make_game' do
+            describe '#make_match' do
               it 'takes two client sockets, gets names, creates players and game with cards dealt and returns a match object' do
-                match = server.make_game(user1, user2)
+                match = server.make_match(user1, user2)
                 expect(match).to be_a Match
+              end
+
+              it 'changes the users current match to this match' do
+                match = server.make_match(user1, user2)
+                expect(user1.current_match).to eq match
+                expect(user2.current_match).to eq match
               end
             end
 
             context 'match is made' do
               let(:player1) { Player.new }
               let(:player2) { Player.new }
-              let(:game) { Game.new(player1: player1, player2: player2) }
-              let(:match) { Match.new(game: game, user1: user1, user2: user2) }
+              let(:game) { match.game }
+              let(:match) { server.make_match(user1, user2) }
               let(:round_result) { RoundResult.new(winner: player1, loser: player2) }
 
-              describe '#play_game' do
+              describe '#play_match' do
                 it 'plays the game until over' do
                   game.player1.add_card(Card.new(rank: "ace", suit: "spades"))
                   game.player2.add_card(Card.new(rank: "jack", suit: "spades"))
                   client.provide_input("\n")
                   client2.provide_input("\n")
-                  server.play_game(match)
+                  server.play_match(match)
                   expect(game.game_over?).to be true
                 end
+              end
 
+              describe 'find_client' do # not sure this works!
                 it 'rejoins a lost user to the game it was in before it was disconnected' do
                   match.game.player1.add_card(Card.new(rank: "ace", suit: "spades"))
-                  match.game.player1.add_card(Card.new(rank: "jack", suit: "spades"))
+                  match.game.player2.add_card(Card.new(rank: "jack", suit: "spades"))
+                  expect(match.game.game_over?).to be false
+                  server.tell_match(match)
                   server.stop_connection(@client2_socket)
-                  server.play_game(match)
                   client2.start
-                  server.accept
-
+                  user2.client = server.accept
+                  client.provide_input("\n")
+                  client2.provide_input("\n")
+                  server.play_match(match)
+                  expect(match.game.game_over?).to be true
                 end
+
+                # what to do if the second player bails
+                # what to do if a player has an unfinished game in their current match but the partner is gone
+                # allow one user to play simultaneous games
               end
 
               describe '#tell_match' do
