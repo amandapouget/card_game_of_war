@@ -33,10 +33,8 @@ class WarServer
   end
 
   def run(client) # NOT TESTED
-    puts "RUNNING"
     user = match_user(client, get_id(client))
-    puts !user.current_match.game.game_over?
-    if !user.current_match.game.game_over?
+    if !(user.current_match.game.game_over?)
       @pending_clients.each { |client| @pending_clients.delete(client) if user.client == client }
       @clients << user.client
     elsif pair_players
@@ -44,7 +42,6 @@ class WarServer
       client2 = @clients[@clients.length-2]
       match = make_match(user1, user2)
       match.game.deal
-      puts "DEALT A GAME!"
       play_match(match)
       [client1, client2].each { |client| stop_connection(client) }
     end
@@ -75,12 +72,14 @@ class WarServer
   def match_user(client, id)
     user = User.find(id)
     if user
-      send_output(client, "Welcome back #{user.name}! Hit enter to play!")
-      input = get_input(client)
-      Thread.kill if input == "client unavailable"
+      send_output(client, "Welcome back #{user.name}!"
     else
+      send_output(client, "What is your name?")
+      name = get_input(client)
       user = User.new(name: get_name(client))
     end
+    send_output(client, "Hit enter to play!")
+    get_input(client)
     user.client = client
     user
   end
