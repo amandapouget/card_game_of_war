@@ -13,6 +13,10 @@ describe WarClient do
     $stdout = old
   end
 
+  def provide_fake_input(text)
+    @socket.puts(text)
+  end
+
   it 'does nothing when initialized' do
     expect { client }.to_not raise_exception
   end

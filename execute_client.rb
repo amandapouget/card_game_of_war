@@ -17,4 +17,5 @@ require './lib/war_client.rb'
 
 client = Client.new.start
 client.puts_welcome
+
 # you'll need a loop here that matches play_game in server, so that the client is outputting at the right moment and sending at the right moment

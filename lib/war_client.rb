@@ -19,8 +19,8 @@ class WarClient
     end
   end
 
-  def provide_input(text)
-    @socket.puts(text)
+  def provide_input
+    @socket.puts(gets.chomp)
   end
 
   def capture_output(delay=0.1)

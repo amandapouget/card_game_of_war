@@ -77,7 +77,6 @@ describe WarServer do
 
           it 'adds the client to pending_clients' do
             client_socket = server.accept
-            server.run(client_socket)
             expect(server.pending_clients[0]).to eq client_socket
           end
         end
@@ -89,10 +88,43 @@ describe WarServer do
           end
         end
 
-        context 'two clients are accepted' do
+        context 'two clients are accepted and a user exists' do
           before do
             @client_socket = server.accept
             @client2_socket = server.accept
+          end
+
+          describe '#get_id' do
+            it 'asks for a unique id and takes client input' do
+              client.provide_input("\n")
+              server.get_id(@client_socket)
+              expect(client.output).to include "Please enter your unique id or hit enter to create a new user."
+            end
+          end
+
+          describe '#get_name' do
+            it 'asks the client for the players name and returns it as a string' do
+              client.provide_input("Amanda")
+              name = server.get_name(@client_socket)
+              expect(client.output).to include "What is your name?"
+              expect(name).to eq "Amanda"
+            end
+          end
+
+          describe '#match_user' do
+            it 'returns a user based on id or new user with name' do
+              user = User.new
+              client.provide_input("\n")
+              expect(server.match_user(@client_socket, 0)).to be_a User
+              client2.provide_input("\n")
+              expect(server.match_user(@client2_socket, user.id)).to eq user
+            end
+
+            it 'sets the user.client to the client_socket' do
+              client.provide_input("\n")
+              user = server.match_user(@client_socket, 0)
+              expect(user.client).to be_a TCPSocket
+            end
           end
 
           describe '#pair_players' do
@@ -103,34 +135,28 @@ describe WarServer do
             end
           end
 
-          context 'clients are paired' do
+          context 'players are paired and users are made' do
+            let(:user1) { User.new(client: @client_socket) }
+            let(:user2) { User.new(client: @client2_socket) }
+
             before :each do
               server.pair_players
             end
 
-            describe '#get_name' do
-              it 'asks the client for the players name and returns it as a string' do
-                client.provide_input("Amanda")
-                name = server.get_name(@client_socket)
-                expect(client.output).to include "What is your name?"
-                expect(name).to eq "Amanda"
-              end
-            end
+# ALL ABOVE PASS
 
             describe '#make_game' do
               it 'takes two client sockets, gets names, creates players and game with cards dealt and returns a match object' do
-                client.provide_input("Amanda")
-                client2.provide_input("Vianney")
-                match = server.make_game(@client_socket, @client2_socket)
+                match = server.make_game(user1, user2)
                 expect(match).to be_a Match
               end
             end
 
             context 'match is made' do
-              let(:player1) { Player.new(name: "Amanda") }
-              let(:player2) { Player.new(name: "Vianney") }
+              let(:player1) { Player.new }
+              let(:player2) { Player.new }
               let(:game) { Game.new(player1: player1, player2: player2) }
-              let(:match) { Match.new(game: game, client1: @client_socket, client2: @client2_socket) }
+              let(:match) { Match.new(game: game, user1: user1, user2: user2) }
               let(:round_result) { RoundResult.new(winner: player1, loser: player2) }
 
               describe '#play_game' do
@@ -141,6 +167,18 @@ describe WarServer do
                   client2.provide_input("\n")
                   server.play_game(match)
                   expect(game.game_over?).to be true
+                end
+
+                it 'rejoins a lost user to the game it was in before it was disconnected' do
+                  match.game.player1.add_card(Card.new(rank: "ace", suit: "spades"))
+                  match.game.player1.add_card(Card.new(rank: "jack", suit: "spades"))
+                  server.tell_match(match)
+                  client.provide_input("\n")
+                  server.stop_connection(@client2_socket)
+                  match.users.each { |user| server.get_input(user.client) }
+                  client2.start
+                  server.accept
+
                 end
               end
 

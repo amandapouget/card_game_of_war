@@ -1,26 +1,26 @@
 class Match
-  attr_accessor :game, :player1, :player2, :client1, :client2
+  attr_accessor :game, :player1, :player2, :user1, :user2
 
-  def initialize(game: Game.new, client1: nil, client2: nil)
+  def initialize(game: Game.new, user1: nil, user2: nil)
     @game = game
-    @client1 = client1
-    @client2 = client2
+    @user1 = user1
+    @user2 = user2
     @player1 = game.player1
     @player2 = game.player2
   end
 
-  def client(player)
-    return @client1 if player == player1
-    return @client2 if player == player2
+  def user(player)
+    return @user1 if player == player1
+    return @user2 if player == player2
   end
 
-  def player(client)
-    return @player1 if client == client1
-    return @player2 if client == client2
+  def player(user)
+    return @player1 if user == user1
+    return @player2 if user == user2
   end
 
-  def clients
-    [@client1, @client2]
+  def users
+    [@user1, @user2]
   end
 
   def to_json
@@ -37,18 +37,22 @@ class Match
 end
 
 class NullMatch
-  attr_accessor :game, :player1, :player2, :client1, :client2
+  attr_accessor :game, :player1, :player2, :user1, :user2
 
-  def client(player)
+  def user(player)
   end
 
-  def player(client)
+  def player(user)
   end
 
-  def clients
+  def users
     []
   end
 
   def to_json
+  end
+
+  def ==(match)
+    match.is_a? NullMatch
   end
 end
