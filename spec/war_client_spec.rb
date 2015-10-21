@@ -1,3 +1,57 @@
+require 'spec_helper'
+
+describe WarClient do
+  let(:client) { WarClient.new }
+  let(:server) { WarServer.new }
+
+  def capture_stdout(&blk)
+    old = $stdout
+    $stdout = fake = StringIO.new
+    blk.call
+    fake.string
+  ensure
+    $stdout = old
+  end
+
+  it 'does nothing when initialized' do
+    expect { client }.to_not raise_exception
+  end
+
+  it '#start tries to connect to the server, with new socket attribute' do
+    begin
+      client.start
+    rescue => e
+      expect(e.message).to match(/connection refused/i)
+    end
+  end
+
+  context 'server and client started, connection accepted,' do
+    before do
+      server.start
+      client.start
+      server.accept
+    end
+
+    after do
+      server.stop_server
+    end
+
+    it '#start when it successfully connects, gets a welcome message back from the server' do
+      expect { client.socket.read_nonblock(1000) }.to_not raise_exception
+    end
+
+    it 'puts the welcome message to the client' do
+      putted = capture_stdout { client.puts_welcome }
+      expect(putted).to match /.+/
+    end
+  end
+end
+
+
+
+
+
+
 =begin
 describe '#tell_starting_state' do
 end

@@ -12,3 +12,8 @@ loop do
 end
 
 # We would really like help with getting around this looping issue, possibly by using Telnet
+
+require './lib/war_client.rb'
+
+client = Client.new.start
+client.puts_welcome

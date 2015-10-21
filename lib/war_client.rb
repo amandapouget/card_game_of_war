@@ -1,3 +1,46 @@
+require 'socket'
+require 'json'
+
+class WarClient
+  attr_reader :socket
+
+  def start
+    @socket = TCPSocket.open('localhost', 2000)
+    # could put your JSON in here to load the welcome message and identifier given by accept in war_server
+  end
+
+  def puts_welcome(delay=0.1)
+    sleep(delay)
+    begin
+      message = @socket.read_nonblock(1000).chomp # Read lines from socket
+      puts message # and print them
+    rescue IO::WaitReadable
+      retry
+    end
+  end
+
+  def provide_input(text)
+    @socket.puts(text)
+  end
+
+  def capture_output(delay=0.1)
+    sleep(delay)
+    @my_output = @socket.read_nonblock(1000)
+    #discern(@my_output) # this has to be JSON
+  rescue IO::WaitReadable
+    @my_output = ""
+  end
+
+  def output
+    capture_output
+    @my_output
+  end
+
+  def discern(output)
+    my_hash = JSON.load(output)
+  end
+end
+
 =begin
 def tell_player_state(client, player)
   client.puts "You have #{match.key(client).count_cards} cards. Hit any key to play round."

@@ -16,7 +16,6 @@ class MockWarClient
   def capture_output(delay=0.1)
     sleep(delay)
     @my_output = @socket.read_nonblock(1000)
-    #discern(@my_output) # this has to be JSON
   rescue IO::WaitReadable
     @my_output = ""
   end
@@ -30,3 +29,12 @@ class MockWarClient
     my_hash = JSON.load(output)
   end
 end
+
+=begin
+NEXT STEP IS TO MAKE CLIENT MODELED OFF OF MOCK CLIENT
+CLIENT MUST:
+-- be able to discern JSON using .parse, .load (not recommended)
+-- be able to spit things out in nice strings
+-- be able to tell the difference between a match and a round_result, and also the difference between the match sent mid-play and that sent at the end of the Game
+-- be able to have a user ID given by the server (do last)
+=end
