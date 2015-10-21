@@ -46,3 +46,16 @@ describe Match do
     expect(my_match.to_json).to eq json_hash
   end
 end
+
+describe NullMatch do
+  let(:nullmatch) { NullMatch.new }
+  let(:player) { NullPlayer.new }
+  let(:client) { MockWarClient.new }
+
+  it 'does nothing in response to match methods' do
+    expect(nullmatch.client(player)).to eq nil
+    expect(nullmatch.player(client)).to eq nil
+    expect(nullmatch.clients).to eq []
+    expect { nullmatch.to_json }.to_not raise_exception
+  end
+end

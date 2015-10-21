@@ -44,6 +44,46 @@ describe WarClient do
       putted = capture_stdout { client.puts_welcome }
       expect(putted).to match /.+/
     end
+
+    it 'provides a unique identifier or hits enter for none' do
+      3
+    end
+
+    it 'if it hits enter, it receives back its new unique identifier' do
+      3
+    end
+
+    it 'if it hits enter, is asked for name' do
+      3
+    end
+
+    it 'if it hits enter, it provides name' do
+      3
+    end
+
+    it 'prints pre-round match state correctly' do
+      3
+    end
+
+    it 'hits enter to start new round' do
+      3
+    end
+
+    it 'prints round_result correctly' do
+      3
+    end
+
+    it 'hits enter to start new round' do
+      3
+    end
+
+    it 'prints post-game match state correctly' do
+      3
+    end
+
+    it 'quits upon hit enter after post-game match state' do
+      3
+    end
   end
 end
 

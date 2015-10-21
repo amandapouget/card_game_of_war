@@ -1,7 +1,7 @@
 class Match
   attr_accessor :game, :player1, :player2, :client1, :client2
 
-  def initialize(game:, client1:, client2:)
+  def initialize(game: Game.new, client1: nil, client2: nil)
     @game = game
     @client1 = client1
     @client2 = client2
@@ -33,5 +33,22 @@ class Match
       loser: game.loser.name,
       rounds_played: game.rounds_played
     }
+  end
+end
+
+class NullMatch
+  attr_accessor :game, :player1, :player2, :client1, :client2
+
+  def client(player)
+  end
+
+  def player(client)
+  end
+
+  def clients
+    []
+  end
+
+  def to_json
   end
 end

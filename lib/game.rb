@@ -5,7 +5,7 @@ require './lib/player.rb'
 class Game
   attr_accessor :player1, :player2, :deck, :winner, :loser, :rounds_played
 
-  def initialize(player1:, player2:)
+  def initialize(player1: Player.new, player2: Player.new)
     @player1 = player1
     @player2 = player2
     @deck = Deck.new(type: 'regular')
