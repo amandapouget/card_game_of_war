@@ -172,10 +172,8 @@ describe WarServer do
                 it 'rejoins a lost user to the game it was in before it was disconnected' do
                   match.game.player1.add_card(Card.new(rank: "ace", suit: "spades"))
                   match.game.player1.add_card(Card.new(rank: "jack", suit: "spades"))
-                  server.tell_match(match)
-                  client.provide_input("\n")
                   server.stop_connection(@client2_socket)
-                  match.users.each { |user| server.get_input(user.client) }
+                  server.play_game(match)
                   client2.start
                   server.accept
 

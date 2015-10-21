@@ -4,6 +4,7 @@ require_relative './game'
 require_relative './player'
 require './lib/user.rb'
 require 'pry'
+require 'timeout'
 
 class WarServer
   attr_accessor :port, :socket, :pending_clients, :clients, :game
@@ -28,7 +29,7 @@ class WarServer
   def accept
     client = @socket.accept
     @pending_clients << client
-    client.puts "Welcome to war! I will connect you with your partner..."
+    send_output(client, "Welcome to war! I will connect you with your partner...")
     client
   end
 
@@ -53,14 +54,14 @@ class WarServer
   end
 
   def get_id(client)
-    client.puts "Please enter your unique id or hit enter to create a new user."
+    send_output(client, "Please enter your unique id or hit enter to create a new user.")
     id = get_input(client).to_i
   end
 
   def match_user(client, id)
     user = User.find(id)
     if user
-      client.puts "Welcome back #{user.name}! Hit enter to play!"
+      send_output(client, "Welcome back #{user.name}! Hit enter to play!")
       get_input(client)
     else
       user = User.new(name: get_name(client))
@@ -70,7 +71,7 @@ class WarServer
   end
 
   def get_name(client)
-    client.puts "What is your name?"
+    send_output(client, "What is your name?")
     get_input(client)
   end
 
@@ -81,8 +82,14 @@ class WarServer
       IO.select([client])
       retry
     rescue IOError
-      return IOError
+      find(client)
     end
+  end
+
+  def send_output(client, output)
+    client.puts(output)
+  rescue IOError
+    find_client(client)
   end
 
   def pair_players
@@ -100,41 +107,38 @@ class WarServer
   def play_game(match)
     while !match.game.game_over?
       tell_match(match)
-      match.users.each { |user|
-        input = get_input(user.client)
-        if input.is_a? IOError
-          find_client(user)
-        end
-      }
+      match.users.each { |user| input = get_input(user.client) }
       round_result = match.game.play_round
       tell_round(match, round_result)
     end
     tell_match(match)
   end
 
-  def find_client(user)
-    found = false
-    until found do
-      # need a way to kill the whole thread if both players disconnect
-      @pending_users.each do |pending_user|
-        if pending_user == user
-          user.client = pending_user.client
-          user.client.puts "Hit enter to reconnect with your game."
-          get_input(user.client)
-          found = true
-        end
-      end
-    end
+  def find_client(client)
+    # found = false
+    # Timeout::timeout(5) do
+    #   until found do
+    #     # need a way to kill the whole thread if both players disconnect
+    #     @pending_users.each do |pending_user|
+    #       if pending_user == user
+    #         user.client = pending_user.client
+    #         user.client.puts "Hit enter to reconnect with your game."
+    #         get_input(user.client)
+    #         found = true
+    #       end
+    #     end
+    #   end
+    # end
   end
 
   def tell_match(match)
     match_info = JSON.dump(match.to_json)
-    match.users.each { |user| user.client.puts(match_info) }
+    match.users.each { |user| send_output(user.client, match_info) }
   end
 
   def tell_round(match, round_result)
     round_info = JSON.dump(round_result.to_json)
-    match.users.each { |user| user.client.puts(round_info) }
+    match.users.each { |user| send_output(user.client, round_info) }
   end
 
   def stop_connection(client)

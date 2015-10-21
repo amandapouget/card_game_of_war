@@ -60,7 +60,6 @@ class NullUser
   def save
   end
 
-
   def add_match(match)
   end
 
