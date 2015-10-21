@@ -30,3 +30,25 @@ class Player
     @cards==[]
   end
 end
+
+class NullPlayer < Player
+  attr_accessor :name, :cards
+
+  def initialize
+    @name = nil
+    @cards = []
+  end
+
+  def play_next_card
+  end
+
+  def collect_winnings
+  end
+
+  def add_card
+  end
+
+  def ==(player)
+    player.is_a? NullPlayer
+  end
+end

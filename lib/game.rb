@@ -1,5 +1,6 @@
 require './lib/deck.rb'
 require './lib/round_result.rb'
+require './lib/player.rb'
 
 class Game
   attr_accessor :player1, :player2, :deck, :winner, :loser, :rounds_played
@@ -8,8 +9,8 @@ class Game
     @player1 = player1
     @player2 = player2
     @deck = Deck.new(type: 'regular')
-    @winner = nil
-    @loser = nil
+    @winner = NullPlayer.new
+    @loser = NullPlayer.new
     @rounds_played = 0
   end
 

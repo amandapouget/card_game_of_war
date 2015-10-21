@@ -19,6 +19,10 @@ class Match
     return @player2 if client == client2
   end
 
+  def clients
+    [@client1, @client2]
+  end
+
   def to_json
     {
       player1: player1.name,

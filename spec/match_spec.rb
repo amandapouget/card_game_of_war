@@ -1,8 +1,4 @@
-require 'match'
-require 'game'
-require 'player'
-require 'socket'
-require 'mock_war_client'
+require 'spec_helper'
 
 describe Match do
   let(:game) { Game.new(player1: Player.new(name: "Amanda"), player2: Player.new(name:"Vianney")) }
@@ -14,6 +10,11 @@ describe Match do
     expect(my_match.client2).to be_truthy
     expect(my_match.player1).to eq my_match.game.player1
     expect(my_match.player2).to eq my_match.game.player2
+  end
+
+  it 'can give you an array of its clients' do
+    expect(my_match.clients[0]).to eq my_match.client1
+    expect(my_match.clients[1]).to eq my_match.client2
   end
 
   it 'can tell you which player is matched to one of its clients' do

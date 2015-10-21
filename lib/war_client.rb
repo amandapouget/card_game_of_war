@@ -1,3 +1,4 @@
+=begin
 def tell_player_state(client, player)
   client.puts "You have #{match.key(client).count_cards} cards. Hit any key to play round."
 end
@@ -44,3 +45,4 @@ end
 
 def congratulate_game(match)
 end
+=end

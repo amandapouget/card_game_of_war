@@ -1,6 +1,4 @@
-require 'game'
-require 'card'
-require 'player'
+require 'spec_helper'
 
 #add test for yield part of playing a round
 
@@ -129,10 +127,10 @@ describe Game do
         expect(game.game_winner).to eq player2
       end
 
-      it 'returns nil if neither player is out of cards' do
+      it 'returns a nullplayer if neither player is out of cards' do
         player1.add_card(card_ad)
         player2.add_card(card_ks)
-        expect(game.game_winner).to eq nil
+        expect(game.game_winner).to eq NullPlayer.new
       end
     end
 
@@ -147,10 +145,10 @@ describe Game do
         expect(game.game_loser).to eq player1
       end
 
-      it 'returns nil if neither player is out of cards' do
+      it 'returns a nullplayer if neither player is out of cards' do
         player1.add_card(card_ad)
         player2.add_card(card_ks)
-        expect(game.game_loser).to eq nil
+        expect(game.game_loser).to eq NullPlayer.new
       end
     end
 

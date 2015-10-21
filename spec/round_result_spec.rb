@@ -1,6 +1,4 @@
-require 'round_result'
-require 'player'
-require 'card'
+require 'spec_helper'
 
 describe RoundResult do
   let(:player1) { Player.new(name: "Amanda") }

@@ -47,7 +47,7 @@ class WarServer
     player2 = Player.new(name: get_name(client2))
     game = Game.new(player1: player1, player2: player2)
     game.deal
-    match = { "game" => game, "client1" => client1, "client2" => client2, client1 => player1, client2 => player2 }
+    Match.new(game: game, client1: client1, client2: client2)
   end
 
   def get_name(client)
@@ -65,35 +65,23 @@ class WarServer
   end
 
   def play_game(match)
-    game = match["game"]
-    while !game.game_over?
-      tell_starting_state(match)
-      round_result = game.play_round
-      tell_ending_state(match, round_result)
+    while !match.game.game_over?
+      tell_match(match)
+      match.clients.each { |client| get_input(client) }
+      round_result = match.game.play_round
+      tell_round(match, round_result)
     end
-    congratulate_game(match)
+    tell_match(match)
   end
 
-  def tell_starting_state(match)
-    #match_clients = [match["client1"], match["client2"]]
-    #match["game"].player1.name
-    #match_to_json = {
-
-
-    #}
-    #match_clients.each { |client| client.puts(JSON.dump(match)) }
+  def tell_match(match)
+    match_info = JSON.dump(match.to_json)
+    match.clients.each { |client| client.puts(match_info) }
   end
 
-  def tell_ending_state(match, round_result)
-    #client.puts(JSON.dump(round_result.to_json))
-
-    #match_clients = [match["client1"], match["client2"]]
-    #match_clients.each { |client| client.puts(JSON.dump(match, round_result)) }
-  end
-
-  def congratulate_game(match)
-    #match_clients = [match["client1"], match["client2"]]
-    #match_clients.each { |client| client.puts(JSON.dump(match)) }
+  def tell_round(match, round_result)
+    round_info = JSON.dump(round_result.to_json)
+    match.clients.each { |client| client.puts(round_info) }
   end
 
   def stop_connection(client)

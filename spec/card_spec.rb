@@ -1,4 +1,4 @@
-require 'card'
+require 'spec_helper'
 
 describe Card do
   describe "#initialize" do

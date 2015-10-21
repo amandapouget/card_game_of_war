@@ -1,3 +1,4 @@
+=begin
 describe '#tell_starting_state' do
 end
 
@@ -49,3 +50,4 @@ describe '#congratulate_game' do
     expect(@client2.output).not_to include "You lost the game!"
   end
 end
+=end

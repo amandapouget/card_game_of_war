@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Player do
-
   describe '#initialize' do
     it 'creates a player object with a readable name and a readable array for holding cards' do
       my_player = Player.new(name: "John")
@@ -80,5 +79,39 @@ describe Player do
         expect(player.out_of_cards?).to be true
       end
     end
+  end
+end
+
+describe NullPlayer do
+  let(:nullplayer) { NullPlayer.new }
+
+  it 'returns nil when its name is called' do
+    expect(nullplayer.name).to eq nil
+  end
+
+  it 'returns an empty array when its cards are called' do
+    expect(nullplayer.cards).to eq []
+  end
+
+  it 'does not raise an exception when the regular player methods are called' do
+    expect { nullplayer.play_next_card }.to_not raise_exception
+    expect { nullplayer.collect_winnings }.to_not raise_exception
+    expect { nullplayer.add_card }.to_not raise_exception
+  end
+
+  it 'returns 0 when its cards are counted' do
+    expect(nullplayer.count_cards).to eq 0
+  end
+
+  it 'returns true when asked if it is out of cards' do
+    expect(nullplayer.out_of_cards?).to be true
+  end
+
+  it 'calls all nullplayer objects equal if comparing two nullplayers' do
+    expect(NullPlayer.new == NullPlayer.new).to be true
+  end
+
+  it 'returns false if comparing the equality of a nullplayer with a player' do
+    expect(NullPlayer.new == Player.new).to be false
   end
 end

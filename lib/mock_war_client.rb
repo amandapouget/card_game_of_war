@@ -28,8 +28,5 @@ class MockWarClient
 
   def discern(output)
     my_hash = JSON.load(output)
-
   end
-
-
 end
