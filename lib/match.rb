@@ -1,12 +1,15 @@
 class Match
   attr_accessor :game, :player1, :player2, :user1, :user2
 
-  def initialize(game: Game.new, user1: nil, user2: nil)
+  def initialize(game: Game.new, user1: User.new, user2: User.new)
     @game = game
     @user1 = user1
     @user2 = user2
     @player1 = game.player1
     @player2 = game.player2
+    user1.add_match(self)
+    user2.add_match(self)
+    @users = [@user1, @user2]
   end
 
   def user(player)
@@ -33,6 +36,11 @@ class Match
       loser: game.loser.name,
       rounds_played: game.rounds_played
     }
+  end
+
+  def end_match
+    @user1.end_current_match if @user1.current_match == self
+    @user2.end_current_match if @user2.current_match == self
   end
 end
 

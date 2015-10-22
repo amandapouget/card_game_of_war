@@ -13,7 +13,11 @@ class WarClient
     sleep(delay)
     begin
       message = @socket.read_nonblock(1000).chomp # Read lines from socket
-      puts message # and print them
+      if message[0] == "{"
+        interpret(message)
+      else
+        puts message
+      end
     rescue IO::WaitReadable
       retry
     end
@@ -22,6 +26,11 @@ class WarClient
   def provide_input(text)
     @socket.puts(text)
   end
+
+  def interpret(message)
+    puts "JSON GOES HERE"
+  end
+
 end
 
 =begin

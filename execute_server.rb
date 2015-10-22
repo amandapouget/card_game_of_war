@@ -1,5 +1,17 @@
 require './lib/war_server.rb'
 
+def get_input
+  begin
+    client.read_nonblock(1000).chomp
+  rescue IO::WaitReadable
+    IO.select([client])
+    retry
+  rescue IOError
+    return nil
+  end
+end
+
 server = WarServer.new()
 server.start
-server.make_threads
+running = Thread.new { server.make_threads }
+server.stop_server if gets.chomp == "stop"

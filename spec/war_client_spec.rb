@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe WarClient do
   let(:client) { WarClient.new }
+  let(:client2) { WarClient.new }
   let(:server) { WarServer.new }
 
   def capture_stdout(&blk)
@@ -45,45 +46,26 @@ describe WarClient do
       expect(putted).to match /.+/
     end
 
-    it 'provides a unique identifier or hits enter for none' do
+    it 'provides input' do
       client.provide_input("yes")
       expect(server.get_input(@client_socket)).to eq "yes"
     end
 
-    it 'if it gives an unlisted value, it receives back its new unique identifier' do
-      3
-    end
+    context 'second user is connected and game is in progress' do
+      before do
+        client2.start
+        @client2_socket = server.accept
+      end
 
-    it 'if it hits enter, is asked for name' do
-      3
-    end
+      it 'interprets json and prints match state correctly' do
+        server.tell_match(match)
+        putted = capture_stdout { client.puts_message }
+        expect(putted).to eq "Happy!"
+      end
 
-    it 'if it hits enter, it provides name' do
-      3
-    end
-
-    it 'prints pre-round match state correctly' do
-      3
-    end
-
-    it 'hits enter to start new round' do
-      3
-    end
-
-    it 'prints round_result correctly' do
-      3
-    end
-
-    it 'hits enter to start new round' do
-      3
-    end
-
-    it 'prints post-game match state correctly' do
-      3
-    end
-
-    it 'quits upon hit enter after post-game match state' do
-      3
+      it 'interprets json and prints round_result correctly' do
+        3
+      end
     end
   end
 end

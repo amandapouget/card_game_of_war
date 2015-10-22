@@ -5,6 +5,7 @@ describe User do
   let(:user2) { User.new() }
   let(:match) { Match.new() }
   let(:match2) { Match.new() }
+  let(:game) { Game.new }
 
   after do
     User.clear
@@ -40,15 +41,30 @@ describe User do
     expect(user.current_match).to eq match
   end
 
-  it 'ends a match by replacing the current_match with a nullmatch' do
+  it 'ends a match by removing the current_match' do
     user.add_match(match)
     user.end_current_match
-    expect(user.current_match).to be_a NullMatch
+    expect(user.current_match).to be nil
   end
 
   it 'returns a list of all users that exist' do
     user
     expect(User.all).to eq [user]
+  end
+
+  it 'erases all users from the program' do
+    user.save
+    user2.save
+    User.clear
+    expect(User.all).to eq []
+  end
+
+  it 'tells you if its current match is still in progress' do
+    user.current_match = match
+    user.current_match.game = game
+    expect(user.match_in_progress?).to be false
+    user.current_match.game.deal
+    expect(user.match_in_progress?).to be true
   end
 end
 
@@ -64,14 +80,15 @@ describe NullUser do
     expect(nulluser.client).to be nil
   end
 
-  it 'has a NullMatch value for current_match' do
-    expect(nulluser.current_match).to eq NullMatch.new
+  it 'has a nil value for current_match' do
+    expect(nulluser.current_match).to be nil
   end
 
   it 'does not raise exceptions when regular User methods are called on it' do
     expect { nulluser.save }.to_not raise_exception
     expect { nulluser.add_match(match) }.to_not raise_exception
     expect { nulluser.end_current_match }.to_not raise_exception
+    expect { nulluser.current_match_in_progress? }.to_not raise_exception
     expect { NullUser.clear }.to_not raise_exception
   end
 

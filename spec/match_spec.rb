@@ -4,12 +4,20 @@ describe Match do
   let(:game) { Game.new(player1: Player.new(name: "Amanda"), player2: Player.new(name:"Vianney")) }
   let(:my_match) { Match.new(game: game, user1: User.new, user2: User.new) }
 
-  it 'initializes with a game and two users, plus two players discerned from the game' do
+  it 'initializes with a game and two users, an array of the users, plus two players discerned from the game' do
     expect(my_match.game).to be_a Game
-    expect(my_match.user1).to be_truthy
-    expect(my_match.user2).to be_truthy
+    expect(my_match.user1).to be_a User
+    expect(my_match.user2).to be_a User
     expect(my_match.player1).to eq my_match.game.player1
     expect(my_match.player2).to eq my_match.game.player2
+    expect(my_match.user1.current_match).to eq my_match
+    expect(my_match.user2.current_match).to eq my_match
+    expect(my_match.users).to match_array [my_match.user1, my_match.user2]
+  end
+
+  it 'upon initialization, makes the user acknowledge it as the current_match' do
+    expect(my_match.user1.current_match).to eq my_match
+    expect(my_match.user2.current_match).to eq my_match
   end
 
   it 'can give you an array of its users' do
@@ -44,6 +52,12 @@ describe Match do
       rounds_played: 0
     }
     expect(my_match.to_json).to eq json_hash
+  end
+
+  it 'can end itself' do
+    my_match.end_match
+    expect(my_match.user1.current_match).to be nil
+    expect(my_match.user2.current_match).to be nil
   end
 end
 

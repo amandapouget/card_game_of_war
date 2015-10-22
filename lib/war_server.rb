@@ -7,7 +7,7 @@ require 'pry'
 require 'timeout'
 
 class WarServer
-  attr_accessor :port, :socket, :pending_clients, :clients, :game
+  attr_accessor :port, :socket, :pending_users, :clients, :game
 
   def initialize(port: 2000)
     @port = port
@@ -15,7 +15,7 @@ class WarServer
 
   def start
     @socket = TCPServer.open('localhost', @port)
-    @pending_clients = []
+    @pending_users = []
     @clients = []
   end
 
@@ -27,24 +27,37 @@ class WarServer
 
   def accept
     client = @socket.accept
-    @pending_clients << client
+    @clients << client
     send_output(client, "Welcome to war! I will connect you with your partner...")
     client
   end
 
   def run(client) # NOT TESTED
     user = match_user(client, get_id(client))
-    if !(user.current_match.game.game_over?)
-      @pending_clients.each { |client| @pending_clients.delete(client) if user.client == client }
-      @clients << user.client
-    elsif pair_players
-      client1 = @clients.last
-      client2 = @clients[@clients.length-2]
-      match = make_match(user1, user2)
+    @pending_users << user unless user.match_in_progress?
+    if player_pair_ready?
+      opponent = @pending_users.shift
+      user = @pending_users.shift
+      match = make_match(user, opponent)
+      ask_to_start_match(match)
       match.game.deal
       play_match(match)
-      [client1, client2].each { |client| stop_connection(client) }
+      match.users.each { |user| stop_connection(user.client) }
     end
+  end
+
+  def player_pair_ready?
+    @pending_users.length >= 2
+  end
+
+  def get_id(client)
+    send_output(client, "Please enter your unique id or hit enter to create a new user.")
+    get_input(client).to_i || die
+  end
+
+  def get_name(client)
+    send_output(client, "What is your name?")
+    get_input(client) || die # add time-out for unresponsive user?
   end
 
   def get_input(client)
@@ -54,7 +67,7 @@ class WarServer
       IO.select([client])
       retry
     rescue IOError
-      return "client unavailable"
+      return nil
     end
   end
 
@@ -63,36 +76,26 @@ class WarServer
   rescue IOError
   end
 
-  def get_id(client)
-    send_output(client, "Please enter your unique id or hit enter to create a new user.")
-    id = get_input(client).to_i
-    Thread.kill if id == "client unavailable"
+  def die(client) # NOT TESTED
+    stop_connection(client)
+    Thread.kill
   end
 
   def match_user(client, id)
     user = User.find(id)
     if user
-      send_output(client, "Welcome back #{user.name}!"
+      send_output(client, "Welcome back #{user.name}!")
     else
-      send_output(client, "What is your name?")
-      name = get_input(client)
       user = User.new(name: get_name(client))
+      send_output(client, "Your unique id is #{user.object_id}. Don't lose it! You'll need it to log in again as you play.")
     end
-    send_output(client, "Hit enter to play!")
-    get_input(client)
     user.client = client
     user
   end
 
-  def get_name(client)
-    send_output(client, "What is your name?")
-    name = get_input(client)
-    Thread.kill if name == "client unavailable"
-    name
-  end
-
-  def pair_players
-    2.times { @clients << @pending_clients.shift } if @pending_clients.length == 2
+  def ask_to_start_match(match)
+    match.users.each { |user| send_output(user.client, "Hit enter to play!") }
+    match.users.each { |user| get_input_or_end_match(30, match, user) }
   end
 
   def make_match(user1, user2)
@@ -100,23 +103,33 @@ class WarServer
     player2 = Player.new(name: user2.name)
     game = Game.new(player1: player1, player2: player2)
     match = Match.new(game: game, user1: user1, user2: user2)
-    [user1, user2].each { |user| user.current_match = match }
     match
   end
 
-  def play_match(match)
+  def play_match(match, timeout_sec = 30)
     while !match.game.game_over?
       tell_match(match)
-        match.users.each do |user|
-          input = get_input(user.client)
-          if input == "client unavailable"
-            Timeout::timeout(30) { input = get_input(user.client) until !(input == "client unavailable") }
-          end
-        end
+      match.users.each { |user| get_input_or_end_match(timeout_sec, match, user) }
       round_result = match.game.play_round
       tell_round(match, round_result)
     end
     tell_match(match)
+    match.end_match
+  end
+
+  def get_input_or_end_match(timeout_sec, match, user) # NOT TESTED
+    input = nil
+    begin
+      Timeout::timeout(timeout_sec) { input = get_input(user.client) until input }
+    rescue
+      match.users.each do |user|
+        send_output(user.client, "Game forfeited!")
+        stop_connection(client)
+      end
+      match.end_match
+      Thread.kill
+    end
+    input if input
   end
 
   def tell_match(match)
@@ -130,16 +143,15 @@ class WarServer
   end
 
   def stop_connection(client)
-    @clients.delete(client)
-    @pending_clients.delete(client)
     client.close unless client.closed?
+    @clients.delete(client)
   end
 
   def stop_server
     connections = []
     @clients.each { |client| connections << client } if @clients
-    @pending_clients.each { |client| connections << client } if @pending_clients
     connections.each { |client| stop_connection(client) }
+    @pending_users = [] if @pending_users
     @socket.close if (@socket && !@socket.closed?)
   end
 end
