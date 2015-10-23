@@ -50,25 +50,35 @@ describe WarClient do
       client.provide_input("yes")
       expect(server.get_input(@client_socket)).to eq "yes"
     end
+  end
 
-    context 'second user is connected and game is in progress' do
-      before do
-        client2.start
-        @client2_socket = server.accept
-      end
+  context 'second user is connected and game is in progress' do
+    before do
+      server.start
+      client.start
+      client2.start
+      @client_socket = server.socket.accept
+      @client2_socket = server.socket.accept
+      @match = (Match.new(game: Game.new, user1: User.new(name: "Amanda", client: @client_socket), user2: User.new(name: "Vianney", client: @client2_socket)))
+      @match.game.deal
+    end
 
-      it 'interprets json and prints match state correctly' do
-        server.tell_match(match)
-        putted = capture_stdout { client.puts_message }
-        expect(putted).to eq "Happy!"
-      end
+    after do
+      server.stop_server
+    end
 
-      it 'interprets json and prints round_result correctly' do
-        3
-      end
+    it 'interprets json and prints match state correctly' do
+      server.tell_match(@match)
+      putted = capture_stdout { client.puts_message }
+      expect(putted).to eq "Happy!"
+    end
+
+    it 'interprets json and prints round_result correctly' do
+      3
     end
   end
 end
+
 
 
 

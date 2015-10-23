@@ -43,6 +43,7 @@ describe Match do
     game.winner = game.player1
     game.loser = game.player2
     json_hash = {
+      type: "match",
       player1: "Amanda",
       player2: "Vianney",
       player1_cards: 0,

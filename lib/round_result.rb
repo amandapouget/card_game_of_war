@@ -15,11 +15,13 @@ class RoundResult
 
   def to_json
     {
+      type: "round_result",
       winner: winner.name,
       loser: loser.name,
       winner_cards: cards_to_s(winner_cards),
       loser_cards: cards_to_s(loser_cards),
-      num_war_sets: num_war_sets }
+      num_war_sets: num_war_sets
+    }
   end
 
   def cards_to_s(cards_array)

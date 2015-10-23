@@ -28,6 +28,7 @@ class Match
 
   def to_json
     {
+      type: "match",
       player1: player1.name,
       player2: player2.name,
       player1_cards: player1.count_cards,

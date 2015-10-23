@@ -28,12 +28,29 @@ class WarClient
   end
 
   def interpret(message)
-    puts "JSON GOES HERE"
+    message_hash = JSON.parse(message)
+    puts matchify(message_hash) if message_hash.fetch("type") == "match"
+    puts round_resultify(message_hash) if message_hash.fetch("type") == "round_result"
   end
 
+  def matchify(message_hash)
+
+  end
+
+  def round_resultify(message_hash)
+
+  end
 end
 
+
+
 =begin
+puts round_info
+match
+{"player1":"Anonymous","player2":"Anonymous","player1_cards":1,"player2_cards":1,"winner":null,"loser":null,"rounds_played":0}
+round
+{"winner":"Anonymous","loser":"Anonymous","winner_cards":["ace of spades"],"loser_cards":["jack of spades"],"num_war_sets":0}
+
   def capture_output(delay=0.1)
     sleep(delay)
     @my_output = @socket.read_nonblock(1000)

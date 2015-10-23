@@ -40,6 +40,7 @@ describe RoundResult do
   describe '#to_json' do
     it 'turns its information into a json-worthy hash' do
       json_hash = {
+        type: "round_result",
         winner: "Amanda",
         loser: "Vianney",
         winner_cards: ["king of hearts", "jack of hearts", "seven of hearts"],
@@ -51,6 +52,7 @@ describe RoundResult do
 
     it 'works when the round had no cards' do
       json_hash = {
+        type: "round_result",
         winner: "Amanda",
         loser: "Vianney",
         winner_cards: [],

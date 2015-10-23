@@ -78,7 +78,7 @@ class WarServer
 
   def die(client) # NOT TESTED
     stop_connection(client)
-    Thread.kill
+    Thread.kill(Thread.current)
   end
 
   def match_user(client, id)
@@ -117,17 +117,17 @@ class WarServer
     match.end_match
   end
 
-  def get_input_or_end_match(timeout_sec, match, user) # NOT TESTED
+  def get_input_or_end_match(timeout_sec, match, user)
     input = nil
     begin
       Timeout::timeout(timeout_sec) { input = get_input(user.client) until input }
     rescue
       match.users.each do |user|
         send_output(user.client, "Game forfeited!")
-        stop_connection(client)
+        stop_connection(user.client)
       end
       match.end_match
-      Thread.kill
+      Thread.kill(Thread.current) unless timeout_sec = 0.1 # moment of cheating... can't have it kill RSPEC thread!
     end
     input if input
   end
