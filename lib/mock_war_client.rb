@@ -1,5 +1,4 @@
 require 'socket'
-require 'json'
 
 class MockWarClient
   attr_reader :socket
